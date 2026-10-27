@@ -1,0 +1,14 @@
+# Archivos generados en tiempo de ejecución
+/logs/*
+!/logs/.htaccess
+/backups/*
+!/backups/.htaccess
+/config/.instalado
+/.env
+*.log
+
+# Volcados de base de datos y residuos del sistema operativo
+/legado/*.sql
+Thumbs.db
+Desktop.ini
+.DS_Store

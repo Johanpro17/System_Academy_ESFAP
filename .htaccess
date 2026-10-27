@@ -1,0 +1,35 @@
+# =========================================================
+# Sistema Académico — Protección de Apache
+# =========================================================
+
+# No listar directorios sin index
+Options -Indexes
+
+# No seguir enlaces simbólicos fuera del árbol de la app
+Options -SymLinksIfOwnerMatch
+
+# Página de entrada por defecto
+DirectoryIndex public/index.php
+
+# Bloquear archivos sensibles por extensión (dumps, logs, claves…)
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(sql|log|ini|bak|old|env|dist|lock)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(sql|log|ini|bak|old|env|dist|lock)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Evitar que se ejecute como PHP cualquier archivo dentro de backups/legado
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# Cabecera base de seguridad si Apache está detrás de un proxy HTTPS
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
