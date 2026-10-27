@@ -300,7 +300,7 @@ require_once APP_ROOT . '/layout/header.php';
         </div>
     </div>
     <div class="panel-body">
-        <div class="grid-3">
+        <div class="export-grid">
             <?php
             $exportables = [
                 'estudiantes' => ['Estudiantes', 'Listado con especialidad y estado', 'M17 21l4.4-4.4M9 11l3 3L22 4'],

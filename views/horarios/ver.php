@@ -16,7 +16,23 @@ $idProfesor = $esAdmin ? null : db()->valor(
     [':u' => Auth::id()]
 );
 
-$dias    = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+$dias    = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+/* La base puede guardar los días con o sin tilde: se normalizan para agrupar */
+$normalizarDia = static function (string $dia): string {
+    $mapa = [
+        'Lunes' => 'Lunes',
+        'Martes' => 'Martes',
+        'Miercoles' => 'Miércoles',
+        'Miércoles' => 'Miércoles',
+        'Jueves' => 'Jueves',
+        'Viernes' => 'Viernes',
+        'Sabado' => 'Sábado',
+        'Sábado' => 'Sábado',
+        'Domingo' => 'Domingo',
+    ];
+
+    return $mapa[$dia] ?? $dia;
+};
 $franjas = ['07:00', '09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
 
 if ($esAdmin) {
@@ -55,7 +71,7 @@ try {
           WHERE h.periodo = :p"
             . ($idCurso ? ' AND h.id_curso = :c' : '')
             . (!$esAdmin ? ' AND h.id_profesor = :profesor' : '') . "
-          ORDER BY FIELD(h.dia_semana,'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'),
+          ORDER BY FIELD(h.dia_semana,'Lunes','Martes','Miércoles','Miercoles','Jueves','Viernes','Sábado','Sabado','Domingo'),
                    h.hora_inicio",
         array_merge(
             [':p' => $periodo],
@@ -70,7 +86,7 @@ try {
 /* Agrupar por día */
 $porDia = [];
 foreach ($horarios as $h) {
-    $porDia[$h['dia_semana']][] = $h;
+    $porDia[$normalizarDia($h['dia_semana'])][] = $h;
 }
 
 /* Detectar solapamientos */
@@ -169,8 +185,8 @@ require_once APP_ROOT . '/layout/header.php';
         </div>
     </div>
 <?php else: ?>
-    <div class="grid-2">
-        <div class="panel">
+    <div class="grid-2 horarios-layout">
+        <div class="panel horarios-semana">
             <div class="panel-head">
                 <div>
                     <h2>Horario semanal</h2>
@@ -178,8 +194,8 @@ require_once APP_ROOT . '/layout/header.php';
                 </div>
             </div>
             <div class="panel-body">
-                <div style="overflow-x:auto">
-                    <table class="data" style="min-width:820px">
+                <div class="horarios-scroll">
+                    <table class="data horarios-tabla">
                         <thead>
                             <tr>
                                 <?php foreach ($dias as $d): ?>
@@ -190,26 +206,22 @@ require_once APP_ROOT . '/layout/header.php';
                         <tbody>
                             <tr>
                                 <?php foreach ($dias as $d): ?>
-                                    <td style="vertical-align:top;min-width:130px">
+                                    <td>
                                         <?php if (empty($porDia[$d])): ?>
-                                            <span class="muted small">—</span>
+                                            <span class="horario-vacio">Sin clases</span>
                                         <?php else: ?>
-                                            <div style="display:flex;flex-direction:column;gap:8px">
+                                            <div class="horario-dia">
                                                 <?php foreach ($porDia[$d] as $h): ?>
-                                                    <div style="background:var(--brand-50);border:1px solid var(--brand-100);border-left:3px solid var(--brand);border-radius:9px;padding:9px 11px">
-                                                        <b style="display:block;font-size:.82rem;line-height:1.3">
-                                                            <?= e($h['curso']) ?>
-                                                        </b>
-                                                        <small style="display:block;color:var(--brand);font-weight:700;font-size:.73rem;margin-top:2px">
+                                                    <div class="horario-bloque">
+                                                        <b class="horario-curso"><?= e($h['curso']) ?></b>
+                                                        <span class="horario-hora">
                                                             <?= e(substr($h['hora_inicio'], 0, 5)) ?> – <?= e(substr($h['hora_fin'], 0, 5)) ?>
-                                                        </small>
-                                                        <small style="display:block;color:var(--text-mute);font-size:.72rem">
-                                                            <?= e($h['profesor']) ?>
-                                                        </small>
+                                                        </span>
+                                                        <span class="horario-dato"><?= e($h['profesor']) ?></span>
                                                         <?php if ($h['aula'] || $h['id_salon']): ?>
-                                                            <small style="display:block;color:var(--text-mute);font-size:.7rem">
+                                                            <span class="horario-dato">
                                                                 Aula: <?= e($h['aula'] ?: $h['id_salon']) ?>
-                                                            </small>
+                                                            </span>
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endforeach; ?>
@@ -249,10 +261,17 @@ require_once APP_ROOT . '/layout/header.php';
                         </div>
                     <?php endforeach; ?>
                 </div>
+            </div>
+        </div>
 
-                <div class="divider"></div>
-
-                <h3 class="section-title" style="margin-top:0">Detalle de bloques</h3>
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Detalle de bloques</h2>
+                    <p>Todas las sesiones del periodo</p>
+                </div>
+            </div>
+            <div class="panel-body">
                 <div class="table-wrap" style="max-height:340px;overflow-y:auto">
                     <table class="data" style="min-width:auto">
                         <thead>

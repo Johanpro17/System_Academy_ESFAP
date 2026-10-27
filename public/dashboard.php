@@ -355,7 +355,7 @@ require_once APP_ROOT . '/layout/header.php';
 
 <h2 class="section-title" data-animar>Módulos del sistema</h2>
 
-<div class="grid-3 mb-3">
+<div class="grid-3 mod-grid mb-3">
     <?php
     $modulos = [
         Auth::tiene_rol(1, 2)

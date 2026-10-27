@@ -2057,7 +2057,7 @@ textarea.input {
 
 /* ---------------- Installer ---------------- */
 
-.panel {
+.auth-wrap .panel {
     max-width: 720px;
     margin: 0 auto;
 }
@@ -3709,4 +3709,237 @@ code {
     .course-form-actions .btn {
         flex: 1 1 0;
     }
+}
+/* =========================================================
+   Alineacion de tarjetas del inicio (panel)
+   Filas parejas, alturas uniformes y metadatos al pie
+   ========================================================= */
+
+.kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+}
+
+.kpi {
+    align-items: center;
+    height: 100%;
+    padding: 20px 22px;
+}
+
+.kpi > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+}
+
+.kpi-delta {
+    margin-top: 2px;
+}
+
+/* Modulos: columnas equilibradas (8 tarjetas = 2 filas exactas) */
+
+.mod-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+}
+
+.mod-grid .mod-card {
+    height: 100%;
+    align-items: flex-start;
+}
+
+.mod-grid .mod-card > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+}
+
+.mod-grid .mod-card .mod-icon {
+    align-self: flex-start;
+}
+
+.mod-grid .mod-card .mod-meta {
+    margin-top: auto;
+    align-self: flex-start;
+}
+
+@media screen and (max-width: 1400px) {
+    .mod-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 1250px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .mod-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 420px) {
+
+    .kpi-grid,
+    .dashboard-welcome + .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+}
+
+/* =========================================================
+   Rejillas de contenido: sin columnas vacias
+   ========================================================= */
+
+.grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media screen and (max-width: 960px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.grid-3:not(.mod-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media screen and (min-width: 700px) and (max-width: 1199px) {
+    .grid-3:not(.mod-grid) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 699px) {
+    .grid-3:not(.mod-grid) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Exportables: las filas siempre se completan (5 tarjetas) */
+
+.export-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.export-grid > * {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+
+/* =========================================================
+   Horarios: rejilla semanal amplia y con aire
+   ========================================================= */
+
+.horarios-layout > .horarios-semana {
+    grid-column: 1 / -1;
+}
+
+.horarios-scroll {
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+}
+
+table.data.horarios-tabla {
+    min-width: 780px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+table.data.horarios-tabla thead th {
+    text-align: center;
+    padding: 12px 10px;
+}
+
+table.data.horarios-tabla tbody td {
+    padding: 16px 12px;
+    vertical-align: top;
+}
+
+table.data.horarios-tabla tbody td + td {
+    border-left: 1px dashed var(--line);
+}
+
+.horario-dia {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.horario-bloque {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    background: linear-gradient(160deg, var(--brand-50),
+            color-mix(in srgb, var(--brand-50) 40%, var(--surface)));
+    border: 1px solid var(--brand-100);
+    border-left: 3px solid var(--brand);
+    box-shadow: 0 2px 6px rgba(13, 21, 38, .05);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.horario-bloque:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(13, 21, 38, .1);
+}
+
+.horario-curso {
+    font-size: .84rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+}
+
+.horario-hora {
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--brand);
+    font-variant-numeric: tabular-nums;
+}
+
+.horario-dato {
+    font-size: .73rem;
+    line-height: 1.35;
+    color: var(--text-mute);
+}
+
+.horario-vacio {
+    display: block;
+    padding: 14px 0;
+    text-align: center;
+    font-size: .75rem;
+    color: var(--text-mute);
+    opacity: .65;
+}
+
+/* Mas aire entre tarjetas */
+
+.kpi-grid {
+    gap: 18px;
+}
+
+.mod-grid {
+    gap: 20px;
+}
+
+.grid-2 {
+    gap: 20px;
+}
+
+.grid-3:not(.mod-grid) {
+    gap: 20px;
 }

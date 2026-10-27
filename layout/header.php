@@ -73,7 +73,7 @@ $rol       = Auth::rol();
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($titulo) ?> · <?= e(APP_NOMBRE) ?></title>
     <link rel="icon" href="<?= e(base_url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
-    <link rel="stylesheet" href="<?= e(base_url('assets/css/sistema.css')) ?>">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/sistema.css')) ?>?v=<?= (int) @filemtime(APP_ROOT . '/public/assets/css/sistema.css') ?>">
 </head>
 
 <body>
