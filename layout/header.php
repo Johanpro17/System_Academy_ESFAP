@@ -64,6 +64,19 @@ $esProfesor   = Auth::es_profesor();
 $esSecretaria = Auth::es_secretaria();
 $esAuditoria  = Auth::es_auditoria();
 $rol          = Auth::rol();
+
+/* Un grupo del menú solo aparece si el rol tiene al menos un permiso dentro de él. */
+$verRegistros      = Auth::puede('estudiantes.ver') || Auth::puede('profesores.ver') || Auth::puede('cursos.ver');
+$verGestion        = Auth::puede('matriculas.ver') || Auth::puede('notas.ver') || Auth::puede('horarios.ver');
+$verComunicacion   = Auth::puede('noticias.ver');
+$verReportes       = Auth::puede('reportes.ver');
+$verAdministracion = Auth::puede('usuarios.ver') || Auth::puede('auditoria.ver');
+
+/* El profesor solo ve sus propios registros. */
+$etiquetaEstudiantes = $esProfesor ? 'Mis estudiantes' : 'Estudiantes';
+$etiquetaCursos      = $esProfesor ? 'Mis cursos' : 'Cursos';
+$etiquetaNotas       = $esProfesor ? 'Mis notas' : 'Notas';
+$etiquetaHorarios    = $esProfesor ? 'Mi horario' : 'Horarios';
 ?>
 <!DOCTYPE html>
 <html lang="es" data-theme="<?= e($tema) ?>">
@@ -93,40 +106,46 @@ $rol          = Auth::rol();
             <nav class="sidebar-nav" aria-label="Navegación del panel">
                     <?php nav_link('dashboard', $esProfesor ? 'profesor.php' : 'dashboard.php', 'Resumen', $paginaActual, $iconos); ?>
 
-                    <div class="nav-label">Registros</div>
-                    <?php if (Auth::puede('estudiantes.ver')): ?>
-                        <?php nav_link('estudiantes', 'views/estudiantes/listar.php', 'Estudiantes', $paginaActual, $iconos); ?>
-                    <?php endif; ?>
-                    <?php if (Auth::puede('profesores.ver')): ?>
-                        <?php nav_link('profesores', 'views/profesores/listar.php', 'Profesores', $paginaActual, $iconos); ?>
-                    <?php endif; ?>
-                    <?php if (Auth::puede('cursos.ver')): ?>
-                        <?php nav_link('cursos', 'views/cursos/listar.php', 'Cursos', $paginaActual, $iconos); ?>
-                    <?php endif; ?>
-
-                    <div class="nav-label">Gestión</div>
-                    <?php if (Auth::puede('matriculas.ver')): ?>
-                        <?php nav_link('matriculas', 'views/matriculas/listar.php', 'Matrículas', $paginaActual, $iconos); ?>
-                    <?php endif; ?>
-                    <?php if (Auth::puede('notas.ver')): ?>
-                        <?php nav_link('notas', 'views/notas/listar.php', 'Notas', $paginaActual, $iconos); ?>
-                    <?php endif; ?>
-                    <?php if (Auth::puede('horarios.ver')): ?>
-                        <?php nav_link('horarios', 'views/horarios/ver.php', 'Horarios', $paginaActual, $iconos); ?>
+                    <?php if ($verRegistros): ?>
+                        <div class="nav-label">Registros</div>
+                        <?php if (Auth::puede('estudiantes.ver')): ?>
+                            <?php nav_link('estudiantes', 'views/estudiantes/listar.php', $etiquetaEstudiantes, $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                        <?php if (Auth::puede('profesores.ver')): ?>
+                            <?php nav_link('profesores', 'views/profesores/listar.php', 'Profesores', $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                        <?php if (Auth::puede('cursos.ver')): ?>
+                            <?php nav_link('cursos', 'views/cursos/listar.php', $etiquetaCursos, $paginaActual, $iconos); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
 
-                    <div class="nav-label">Comunicación</div>
-                    <?php if (Auth::puede('noticias.ver')): ?>
-                        <?php nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos); ?>
+                    <?php if ($verGestion): ?>
+                        <div class="nav-label">Gestión</div>
+                        <?php if (Auth::puede('matriculas.ver')): ?>
+                            <?php nav_link('matriculas', 'views/matriculas/listar.php', 'Matrículas', $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                        <?php if (Auth::puede('notas.ver')): ?>
+                            <?php nav_link('notas', 'views/notas/listar.php', $etiquetaNotas, $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                        <?php if (Auth::puede('horarios.ver')): ?>
+                            <?php nav_link('horarios', 'views/horarios/ver.php', $etiquetaHorarios, $paginaActual, $iconos); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
 
-                    <?php if (Auth::puede('reportes.ver')): ?>
+                    <?php if ($verComunicacion): ?>
+                        <div class="nav-label">Comunicación</div>
+                        <?php if (Auth::puede('noticias.ver')): ?>
+                            <?php nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <?php if ($verReportes): ?>
                         <div class="nav-label">Reportes</div>
                         <?php nav_link('reportes', 'views/reportes/generar.php', 'Generar reportes', $paginaActual, $iconos); ?>
                         <?php nav_link('reportes', 'views/estudiantes/reportes/promedios.php', 'Promedios', $paginaActual, $iconos); ?>
                     <?php endif; ?>
 
-                    <?php if (Auth::puede('usuarios.ver') || Auth::puede('auditoria.ver')): ?>
+                    <?php if ($verAdministracion): ?>
                         <div class="nav-label">Administración</div>
                         <?php if (Auth::puede('usuarios.ver')): ?>
                             <?php nav_link('usuarios', 'views/usuarios/listar.php', 'Usuarios', $paginaActual, $iconos); ?>

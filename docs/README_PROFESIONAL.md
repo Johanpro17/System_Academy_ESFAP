@@ -26,8 +26,8 @@ Sistema de gestión académica para la Escuela de Formación Artística ESFAP: f
 | Rol | Alcance |
 | --- | --- |
 | Administrador | Acceso total; gestiona usuarios, profesores, cursos, noticias y configuración |
-| Profesor | Panel propio; solo sus cursos, notas, reportes, constancias y horarios |
-| Secretaría | Gestiona estudiantes, matrículas y constancias; consulta el resto (notas en solo lectura) |
+| Profesor | Panel propio; solo sus cursos, estudiantes, notas y horario |
+| Secretaría | Gestiona estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios, reportes y noticias |
 | Auditoría | Consulta toda la información y la bitácora, sin escrituras |
 
 El alumno **no tiene cuenta en este sistema**. Su ficha vive en `estudiantes` (nombres, apellidos, DNI, matrícula, especialidad, contacto, estado). Las cuentas históricas de alumno quedan desactivadas, sin rol y sin acceso; sus datos se conservan. El portal del alumno será una plataforma aparte.
@@ -42,7 +42,8 @@ El alumno **no tiene cuenta en este sistema**. Su ficha vive en `estudiantes` (n
 - Manejador centralizado de errores (sin exponer rutas ni SQL)
 - Permisos por acción (`Auth::puede()` / `Auth::requerir_permiso()`); cada escritura valida su permiso también en el POST
 - El login exige un rol activo: una cuenta sin rol no obtiene sesión
-- Las cuentas de profesor se crean o vinculan desde la ficha de profesor; el panel, listados, reportes, exportaciones, constancias y notas se limitan a sus cursos asignados
+- Las cuentas de profesor se crean o vinculan desde la ficha de profesor; el panel, listados, notas, horarios y exportaciones se limitan a sus cursos asignados
+- La matriz completa de permisos y módulos visibles está en [`docs/PERMISOS.md`](PERMISOS.md)
 
 ## Instalación rápida
 

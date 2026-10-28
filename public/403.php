@@ -5,7 +5,7 @@ $url = 'javascript:history.back()';
 $texto = 'Volver atrás';
 if (defined('APP_NOMBRE')) {
     $mensaje = 'Acceso no autorizado.';
-    $url = base_url('public/dashboard.php');
+    $url = base_url('dashboard.php');
     $texto = 'Ir al panel';
 }
 ?>

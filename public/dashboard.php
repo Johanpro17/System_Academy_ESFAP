@@ -20,7 +20,14 @@ if (!Auth::puede('dashboard.ver')) {
 $esAdmin      = Auth::es_admin();
 $esSecretaria = Auth::es_secretaria();
 $esAuditoria  = Auth::es_auditoria();
-$puedeAuditoria = Auth::puede('auditoria.ver');
+
+$puedeAuditoria   = Auth::puede('auditoria.ver');
+$puedeEstudiantes = Auth::puede('estudiantes.ver');
+$puedeCursos      = Auth::puede('cursos.ver');
+$puedeProfesores  = Auth::puede('profesores.ver');
+$puedeMatriculas  = Auth::puede('matriculas.ver');
+$puedeNoticias    = Auth::puede('noticias.ver');
+$puedeCrearMatricula = Auth::puede('matriculas.crear');
 
 /* ------------------------------------------------------------------
  * Indicadores
@@ -126,17 +133,19 @@ try {
 }
 
 $noticias = [];
-try {
-    $noticias = db()->todas(
-        "SELECT n.titulo, n.contenido, n.publicado_en, u.nombres AS autor
-           FROM noticias n
-           LEFT JOIN usuarios u ON u.id_usuario = n.autor_id
-          WHERE n.publicado = 1
-          ORDER BY n.destacado DESC, n.publicado_en DESC
-          LIMIT 3"
-    );
-} catch (Throwable $e) {
-    $noticias = [];
+if ($puedeNoticias) {
+    try {
+        $noticias = db()->todas(
+            "SELECT n.titulo, n.contenido, n.publicado_en, u.nombres AS autor
+               FROM noticias n
+               LEFT JOIN usuarios u ON u.id_usuario = n.autor_id
+              WHERE n.publicado = 1
+              ORDER BY n.destacado DESC, n.publicado_en DESC
+              LIMIT 3"
+        );
+    } catch (Throwable $e) {
+        $noticias = [];
+    }
 }
 
 $actividad = [];
@@ -224,6 +233,7 @@ require_once APP_ROOT . '/layout/header.php';
 </section>
 
 <div class="kpi-grid">
+    <?php if ($puedeEstudiantes): ?>
     <div class="kpi" data-animar>
         <span class="kpi-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -235,7 +245,9 @@ require_once APP_ROOT . '/layout/header.php';
             <div class="kpi-label">Estudiantes</div>
         </div>
     </div>
+    <?php endif; ?>
 
+    <?php if ($puedeCursos): ?>
     <div class="kpi" data-animar data-animar-delay="1">
         <span class="kpi-icon ok">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -247,7 +259,9 @@ require_once APP_ROOT . '/layout/header.php';
             <div class="kpi-label">Cursos activos</div>
         </div>
     </div>
+    <?php endif; ?>
 
+    <?php if ($puedeProfesores): ?>
     <div class="kpi" data-animar data-animar-delay="2">
         <span class="kpi-icon gold">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -259,7 +273,9 @@ require_once APP_ROOT . '/layout/header.php';
             <div class="kpi-label">Profesores</div>
         </div>
     </div>
+    <?php endif; ?>
 
+    <?php if ($puedeMatriculas): ?>
     <div class="kpi" data-animar data-animar-delay="3">
         <span class="kpi-icon warn">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -272,6 +288,7 @@ require_once APP_ROOT . '/layout/header.php';
             <div class="kpi-delta up"><?= number_format($totales['matriculas'], 0, ',', '.') ?> en total</div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <!-- ================= Gráficas ================= -->
@@ -457,6 +474,7 @@ require_once APP_ROOT . '/layout/header.php';
 <!-- ================= Actividad ================= -->
 
 <div class="grid-2">
+    <?php if ($puedeMatriculas): ?>
     <div class="panel" data-animar>
         <div class="panel-head">
             <div>
@@ -475,7 +493,9 @@ require_once APP_ROOT . '/layout/header.php';
                 </svg>
                 <h3>Sin matrículas todavía</h3>
                 <p>Crea la primera matrícula para empezar a tener datos en el panel.</p>
-                <a class="btn btn-primary" href="<?= e(base_url('views/matriculas/crear.php')) ?>">Crear matrícula</a>
+                <?php if ($puedeCrearMatricula): ?>
+                    <a class="btn btn-primary" href="<?= e(base_url('views/matriculas/crear.php')) ?>">Crear matrícula</a>
+                <?php endif; ?>
             </div>
         <?php else: ?>
             <div class="list">
@@ -496,7 +516,9 @@ require_once APP_ROOT . '/layout/header.php';
             </div>
         <?php endif; ?>
     </div>
+    <?php endif; ?>
 
+    <?php if ($puedeAuditoria || $puedeNoticias): ?>
     <div class="panel" data-animar data-animar-delay="1">
         <div class="panel-head">
             <div>
@@ -560,6 +582,7 @@ require_once APP_ROOT . '/layout/header.php';
             </div>
         <?php endif; ?>
     </div>
+    <?php endif; ?>
 </div>
 
 <?php require_once APP_ROOT . '/layout/footer.php'; ?>

@@ -249,7 +249,9 @@ require_once APP_ROOT . '/layout/header.php';
                     </svg>
                     <h3>Sin datos de rendimiento</h3>
                     <p>Registra notas en el periodo para ver este ranking.</p>
-                    <a class="btn btn-primary" href="<?= e(base_url('views/notas/listar.php')) ?>">Ir a notas</a>
+                    <?php if (Auth::puede('notas.ver')): ?>
+                        <a class="btn btn-primary" href="<?= e(base_url('views/notas/listar.php')) ?>">Ir a notas</a>
+                    <?php endif; ?>
                 </div>
             <?php else: ?>
                 <div class="table-wrap">

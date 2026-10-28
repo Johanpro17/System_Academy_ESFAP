@@ -207,7 +207,9 @@ require_once APP_ROOT . '/layout/header.php';
                 </svg>
                 <h3>Sin promedios para mostrar</h3>
                 <p>No hay notas registradas en el periodo seleccionado o no coinciden con los filtros.</p>
-                <a class="btn btn-primary" href="<?= e(base_url('views/notas/listar.php')) ?>">Registrar notas</a>
+                <?php if (Auth::puede('notas.ver')): ?>
+                    <a class="btn btn-primary" href="<?= e(base_url('views/notas/listar.php')) ?>">Registrar notas</a>
+                <?php endif; ?>
             </div>
         <?php else: ?>
             <div class="table-wrap">

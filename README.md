@@ -14,8 +14,8 @@ El sistema tiene **cuatro roles**:
 | Rol | Alcance |
 | --- | --- |
 | Administrador | Acceso total; gestiona usuarios, profesores, cursos, noticias y configuración |
-| Profesor | Panel propio; solo sus cursos, notas, reportes, constancias y horarios |
-| Secretaría | Gestiona estudiantes, matrículas y constancias; consulta el resto (notas en solo lectura) |
+| Profesor | Panel propio; solo sus cursos, estudiantes, notas y horario |
+| Secretaría | Gestiona estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios, reportes y noticias |
 | Auditoría | Consulta toda la información y la bitácora, sin escrituras |
 
 El **alumno no es un usuario de este sistema**: es una ficha académica (nombres, apellidos, DNI, matrícula, especialidad, contacto y estado). Las cuentas históricas de alumno se conservan desactivadas y sin rol, por lo que no pueden iniciar sesión aquí. Su acceso, si se habilita, pertenecerá a la plataforma de alumnos que se implementará por separado.
@@ -89,6 +89,7 @@ El esquema está preparado para crecer:
 ## Documentación
 
 - [`docs/BASE_DE_DATOS.md`](docs/BASE_DE_DATOS.md): dónde vive la base y cómo se conecta el sistema.
+- [`docs/PERMISOS.md`](docs/PERMISOS.md): matriz de permisos por rol, módulos visibles y cómo se aplican las restricciones.
 - [`docs/ESQUEMA_V3.md`](docs/ESQUEMA_V3.md): base nueva `escuela_artistica_v3` y equivalencias con el esquema actual.
 - [`docs/README_PROFESIONAL.md`](docs/README_PROFESIONAL.md): guía funcional, roles, backups y monitoreo.
 - [`docs/ESTADO.md`](docs/ESTADO.md): arquitectura actual y verificaciones.

@@ -9,6 +9,14 @@
 - `roles.activo` permite desactivar un rol sin borrar su historial.
 - El login exige `usuarios.activo = 1`, `id_rol` no nulo y un rol activo. `Auth::iniciar()` no asigna Administrador por defecto.
 
+### Permisos por rol (2026-10-28)
+
+- Profesor limitado a resumen, sus estudiantes, sus cursos, sus notas y su horario.
+- Secretaría sin notas, usuarios ni auditoría; no puede eliminar estudiantes ni matrículas.
+- Auditoría en solo lectura global, sin noticias; su panel muestra la bitácora.
+- Menú, dashboard y enlaces contextuales se generan con `Auth::puede()`; un acceso directo sin permiso responde 403.
+- Matriz completa en [`docs/PERMISOS.md`](PERMISOS.md).
+
 ### Ficha de alumno independiente
 
 - `estudiantes` incorpora `nombres`, `apellidos`, `email`, `telefono`, `creado_en` y `actualizado_en`.
