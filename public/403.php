@@ -22,10 +22,10 @@ if (defined('APP_NOMBRE')) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="<?= e(base_url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
     <style>
-        :root{--bg:#f4f6fb;--card:#fff;--line:#e3e8f0;--text:#0d1526;--muted:#4b5768;--brand:#6d28d9}
+        :root{--bg:#f7f4fc;--card:#fff;--line:#e9e3f3;--text:#140f24;--muted:#554d68;--brand:#6d28d9}
         *{box-sizing:border-box;font-family:Inter,sans-serif}
         body{margin:0;background:radial-gradient(1000px 600px at 90% -10%,rgba(200,162,74,.09),transparent 62%),radial-gradient(1000px 640px at -10% 2%,rgba(109,40,217,.09),transparent 62%),var(--bg);color:var(--text);display:grid;place-items:center;min-height:100vh;padding:24px}
-        .card{max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:0 24px 60px rgba(13,21,38,.12);padding:44px;text-align:center;position:relative;overflow:hidden}
+        .card{max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:0 24px 60px rgba(20,15,36,.12);padding:44px;text-align:center;position:relative;overflow:hidden}
         .card::after{content:"";position:absolute;inset:0;background:radial-gradient(240px 160px at 92% 12%,rgba(200,162,74,.18),transparent 64%);pointer-events:none}
         .card>*{position:relative;z-index:2}
         .mark{width:72px;height:72px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(140deg,#7c3aed,#5b21b6);color:#fff;font-size:1.7rem;font-weight:800;box-shadow:0 12px 30px rgba(91,33,182,.28)}

@@ -44,7 +44,7 @@ $pasos = [
 
 $indicadores = [
     ['4', 'Módulos operativos'],
-    ['3', 'Perfiles de acceso'],
+    ['5', 'Perfiles de acceso'],
     ['100%', 'Trazabilidad'],
 ];
 ?>
@@ -97,7 +97,7 @@ $indicadores = [
                     <span class="eyebrow">Plataforma institucional</span>
                     <h1>Gestión académica <em>moderna</em> para tu institución</h1>
                     <p class="lead">
-                        Accede a un sistema intuitivo para estudiantes, docentes, secretaría y administración.
+                        Accede a un sistema intuitivo para estudiantes, docentes, secretaría, auditoría y administración.
                         Controla matrículas, cursos, reportes y horarios en una sola experiencia profesional.
                     </p>
 
@@ -194,7 +194,7 @@ $indicadores = [
                 <div class="section-head">
                     <span class="eyebrow">Flujo de trabajo</span>
                     <h2>Tres pasos para empezar</h2>
-                    <p>Sinuckles ni curvas de aprendizaje: el sistema está pensado para usarse el mismo día de instalación.</p>
+                    <p>Sin nudos ni curvas de aprendizaje: el sistema está pensado para usarse el mismo día de instalación.</p>
                 </div>
 
                 <ol class="steps">

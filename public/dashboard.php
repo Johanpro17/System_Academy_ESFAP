@@ -179,7 +179,7 @@ if (Auth::puede('matriculas.crear')) {
 
 $eyebrow = $esAdmin
     ? 'Panel de administración'
-    : ($esSecretaria ? 'Panel de secretaría' : 'Panel de auditoría');
+    : ($esSecretaria ? 'Secretaría académica' : 'Control y transparencia');
 
 require_once APP_ROOT . '/layout/header.php';
 ?>
@@ -466,7 +466,7 @@ require_once APP_ROOT . '/layout/header.php';
         <div class="panel-head">
             <div>
                 <h2>Matrículas recientes</h2>
-                <p>Últimos registros inscribed</p>
+                <p>Últimos registros inscritos</p>
             </div>
             <div class="panel-actions">
                 <a class="btn btn-ghost btn-sm" href="<?= e(base_url('views/matriculas/listar.php')) ?>">Ver todas</a>

@@ -131,7 +131,7 @@ ejecutar(
 $roles = [
     [1, 'Administrador', 'Acceso total al sistema'],
     [2, 'Docente',        'Gestiona notas y consulta sus cursos asignados'],
-    [3, 'Estudiante',     'Consulta sus notas, matriculas y horarios'],
+    [3, 'Estudiante',     'Consulta sus notas, matrículas y horarios'],
     [4, 'Secretaría',     'Gestiona estudiantes, matrículas y constancias'],
     [5, 'Auditoría',      'Consulta toda la información y la bitácora del sistema'],
 ];

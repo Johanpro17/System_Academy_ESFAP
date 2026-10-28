@@ -14,11 +14,11 @@
     --gold: #c8a24a;
     --gold-soft: #f6ecd4;
 
-    --ok: #0f9d58;
+    --ok: #0b7a45;
     --ok-bg: #e7f6ee;
     --warn: #b45309;
     --warn-bg: #fef4e2;
-    --danger: #dc2626;
+    --danger: #b91c1c;
     --danger-bg: #fdecec;
     --info: #0369a1;
     --info-bg: #e0f2fe;
@@ -31,7 +31,7 @@
 
     --text: #140f24;
     --text-soft: #554d68;
-    --text-mute: #7f7590;
+    --text-mute: #746a88;
 
     --sidebar-bg: #170f2b;
     --sidebar-item: #a99cc4;
@@ -43,10 +43,10 @@
     --r-lg: 20px;
     --r-xl: 28px;
 
-    --sh-xs: 0 1px 2px rgba(13, 21, 38, .06);
-    --sh-sm: 0 2px 8px rgba(13, 21, 38, .06);
-    --sh: 0 8px 24px rgba(13, 21, 38, .08);
-    --sh-lg: 0 20px 50px rgba(13, 21, 38, .12);
+    --sh-xs: 0 1px 2px rgba(20, 15, 36, .06);
+    --sh-sm: 0 2px 8px rgba(20, 15, 36, .06);
+    --sh: 0 8px 24px rgba(20, 15, 36, .08);
+    --sh-lg: 0 20px 50px rgba(20, 15, 36, .12);
 
     --sans: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -216,7 +216,7 @@ svg {
     font-size: .66rem;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: #7f8ca3;
+    color: #9a8fb5;
     font-weight: 600;
 }
 
@@ -237,7 +237,7 @@ svg {
     font-weight: 700;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: #5f6d85;
+    color: #8f82ab;
 }
 
 .nav-label:first-child {
@@ -325,7 +325,7 @@ svg {
 .sidebar-user small {
     display: block;
     font-size: .68rem;
-    color: #7f8ca3;
+    color: #9a8fb5;
 }
 
 /* ---------------- Main ---------------- */
@@ -441,7 +441,7 @@ svg {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(8, 13, 24, .5);
+    background: rgba(10, 7, 20, .5);
     z-index: 55;
     backdrop-filter: blur(2px);
 }
@@ -735,7 +735,7 @@ body.nav-open .scrim {
 
 .kpi-icon.gold {
     background: var(--gold-soft);
-    color: #9a7b2f;
+    color: #7d5a14;
 }
 
 .kpi-value {
@@ -917,7 +917,7 @@ body.nav-open .scrim {
 
 .mod-card.is-gold .mod-icon {
     background: var(--gold-soft);
-    color: #9a7b2f;
+    color: #7d5a14;
 }
 
 .mod-card h3 {
@@ -1101,7 +1101,7 @@ table.data th.num {
 
 .badge-gold {
     background: var(--gold-soft);
-    color: #9a7b2f;
+    color: #7d5a14;
     border-color: rgba(200, 162, 74, .4);
 }
 
@@ -1121,13 +1121,13 @@ table.data th.num {
 
 .rol-estudiante {
     background: var(--gold-soft);
-    color: #9a7b2f;
+    color: #7d5a14;
     border-color: rgba(200, 162, 74, .4);
 }
 
 .rol-secretaria {
     background: #fdf3e3;
-    color: #9a6a1f;
+    color: #7d5a14;
     border-color: rgba(200, 162, 74, .45);
 }
 
@@ -1270,7 +1270,7 @@ textarea.input {
 select.input {
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a8698' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237f7590' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 16px;
@@ -1278,7 +1278,7 @@ select.input {
 }
 
 [data-theme="oscuro"] select.input {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a8aa3' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238d81a8' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
 .input::placeholder {
@@ -2445,7 +2445,7 @@ code {
     position: fixed;
     inset: 0;
     z-index: 90;
-    background: rgba(8, 13, 24, .55);
+    background: rgba(10, 7, 20, .55);
     backdrop-filter: blur(3px);
     display: grid;
     place-items: center;
@@ -2906,8 +2906,8 @@ code {
 
     .topbar {
         background: color-mix(in srgb, var(--surface) 82%, transparent);
-        box-shadow: 0 1px 0 rgba(12, 18, 36, .02),
-            0 12px 32px rgba(13, 21, 38, .05);
+        box-shadow: 0 1px 0 rgba(20, 15, 36, .02),
+            0 12px 32px rgba(20, 15, 36, .05);
     }
 
     [data-theme="oscuro"] .topbar {
@@ -2938,7 +2938,7 @@ code {
 
     .icon-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(13, 21, 38, .1);
+        box-shadow: 0 6px 16px rgba(20, 15, 36, .1);
     }
 
     /* ---------- Superficies ---------- */
@@ -2950,8 +2950,8 @@ code {
     }
 
     .panel {
-        box-shadow: 0 1px 2px rgba(13, 21, 38, .04),
-            0 18px 44px rgba(13, 21, 38, .07);
+        box-shadow: 0 1px 2px rgba(20, 15, 36, .04),
+            0 18px 44px rgba(20, 15, 36, .07);
     }
 
     [data-theme="oscuro"] .panel,
@@ -2962,8 +2962,8 @@ code {
     }
 
     .card {
-        box-shadow: 0 1px 2px rgba(13, 21, 38, .03),
-            0 12px 28px rgba(13, 21, 38, .05);
+        box-shadow: 0 1px 2px rgba(20, 15, 36, .03),
+            0 12px 28px rgba(20, 15, 36, .05);
     }
 
     .panel-head {
@@ -3031,7 +3031,7 @@ code {
 
     .btn-outline {
         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line-strong) 70%, transparent),
-            0 1px 3px rgba(13, 21, 38, .04);
+            0 1px 3px rgba(20, 15, 36, .04);
     }
 
     /* ---------- Marca y avatar ---------- */
@@ -3913,13 +3913,13 @@ table.data.horarios-tabla tbody td + td {
             color-mix(in srgb, var(--brand-50) 40%, var(--surface)));
     border: 1px solid var(--brand-100);
     border-left: 3px solid var(--brand);
-    box-shadow: 0 2px 6px rgba(13, 21, 38, .05);
+    box-shadow: 0 2px 6px rgba(20, 15, 36, .05);
     transition: transform .18s ease, box-shadow .18s ease;
 }
 
 .horario-bloque:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(13, 21, 38, .1);
+    box-shadow: 0 10px 22px rgba(20, 15, 36, .1);
 }
 
 .horario-curso {
@@ -3967,4 +3967,300 @@ table.data.horarios-tabla tbody td + td {
 
 .grid-3:not(.mod-grid) {
     gap: 20px;
+}
+
+/* =========================================================
+   Acabado profesional
+   Jerarquía, ritmo y orden visual con la paleta morada
+   (solo presentación; no altera estructura ni lógica)
+   ========================================================= */
+
+::selection {
+    background: color-mix(in srgb, var(--brand) 24%, transparent);
+    color: var(--text);
+}
+
+/* Lienzo: centrado y con aire en pantallas grandes */
+@media screen and (min-width: 901px) {
+    .content {
+        width: 100%;
+        max-width: 1580px;
+        margin-inline: auto;
+        padding: 30px 34px 52px;
+    }
+}
+
+/* Paneles: cabecera y cuerpo comparten el mismo ritmo */
+.panel-head {
+    padding: 21px 26px;
+}
+
+.panel-body {
+    padding: 24px 26px;
+}
+
+/* El filtro pertenece al panel, no es una caja dentro de otra */
+.panel-body > .toolbar {
+    margin: 0 0 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.panel-body > .toolbar:last-child {
+    margin-bottom: 0;
+}
+
+/* Controles de filtro con altura y alineación uniformes */
+.toolbar .input,
+.toolbar select.input,
+.toolbar .btn,
+.search-wrap .input {
+    min-height: 42px;
+}
+
+.toolbar .btn {
+    padding-block: 0;
+}
+
+.toolbar .btn-sm {
+    min-height: 38px;
+    padding-block: 0;
+}
+
+/* Tablas: lectura cómoda y alineadas al padding del panel */
+table.data thead th:first-child,
+table.data tbody td:first-child {
+    padding-left: 26px;
+}
+
+table.data thead th:last-child,
+table.data tbody td:last-child {
+    padding-right: 26px;
+}
+
+table.data tbody td {
+    padding-block: 14px;
+}
+
+table.data tbody tr:focus-within {
+    background: var(--brand-50);
+}
+
+.table-wrap {
+    position: relative;
+}
+
+.table-wrap::-webkit-scrollbar {
+    height: 10px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--brand) 26%, var(--line-strong));
+    border: 3px solid var(--surface);
+    border-radius: 999px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Paginación integrada al panel, sin segunda tarjeta */
+.panel-body > .paginacion {
+    margin-top: 18px;
+    padding: 14px 0 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+}
+
+/* KPI: acento tenue y contenido por delante del brillo */
+.kpi {
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi::after {
+    content: "";
+    position: absolute;
+    top: -46px;
+    right: -46px;
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--brand) 13%, transparent), transparent 70%);
+    pointer-events: none;
+}
+
+.kpi-icon,
+.kpi > div {
+    position: relative;
+    z-index: 1;
+}
+
+/* Bienvenida del panel: acento sobrio morado → dorado */
+.dashboard-welcome {
+    box-shadow: 0 1px 2px rgba(20, 15, 36, .04),
+        0 18px 42px rgba(20, 15, 36, .06);
+}
+
+.dashboard-welcome::before {
+    content: "";
+    position: absolute;
+    inset: 18% auto 18% 0;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(180deg, var(--brand), var(--gold));
+}
+
+/* Foco visible coherente en enlaces y controles de navegación */
+.mod-card:focus-visible,
+.nav-item:focus-visible,
+.page-btn:focus-visible,
+.nav a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--brand-50),
+        inset 0 0 0 2px var(--brand);
+}
+
+/* Pantallas medianas */
+@media screen and (max-width: 760px) {
+    .dashboard-welcome {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .dashboard-quick-actions {
+        width: 100%;
+    }
+
+    .dashboard-quick-actions .btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* Pantallas pequeñas: filtros y tablas respirables */
+@media screen and (max-width: 700px) {
+    .toolbar {
+        padding: 14px;
+    }
+
+    .panel-body > .toolbar {
+        padding: 0;
+    }
+
+    .toolbar .input,
+    .toolbar select.input,
+    .search-wrap {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    .toolbar .toolbar-right {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .toolbar .toolbar-right .btn {
+        flex: 1 1 0;
+    }
+
+    .panel-head {
+        padding: 18px;
+    }
+
+    .panel-body {
+        padding: 18px;
+    }
+
+    table.data thead th:first-child,
+    table.data tbody td:first-child {
+        padding-left: 18px;
+    }
+
+    table.data thead th:last-child,
+    table.data tbody td:last-child {
+        padding-right: 18px;
+    }
+}
+
+/* Modo oscuro: el filtro integrado no debe recuperar la caja clara */
+[data-theme="oscuro"] .panel-body > .toolbar {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Modo oscuro: estados y roles con contraste suficiente */
+[data-theme="oscuro"] .badge-green,
+[data-theme="oscuro"] .alert-success,
+[data-theme="oscuro"] .rol-docente {
+    color: #4ade80;
+}
+
+[data-theme="oscuro"] .badge-red,
+[data-theme="oscuro"] .alert-error {
+    color: #f87171;
+}
+
+[data-theme="oscuro"] .badge-amber,
+[data-theme="oscuro"] .alert-warning {
+    color: #fbbf24;
+}
+
+[data-theme="oscuro"] .alert-info {
+    color: #7dd3fc;
+}
+
+[data-theme="oscuro"] .badge-gold,
+[data-theme="oscuro"] .rol-estudiante,
+[data-theme="oscuro"] .rol-secretaria {
+    color: #e2be74;
+}
+
+/* Acciones de tabla: botones de icono cuadrados y alineados */
+.data .btn-sm:has(> svg:only-child) {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    flex: 0 0 34px;
+}
+
+.data td .flex {
+    flex-wrap: nowrap;
+}
+
+.data td form {
+    display: inline-flex;
+    margin: 0;
+}
+
+/* Barra superior flexible en pantallas medianas y pequeñas */
+@media screen and (max-width: 900px) {
+    .topbar {
+        height: auto;
+        min-height: var(--topbar-h);
+        padding-block: 10px;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .topbar-title p {
+        display: none;
+    }
+
+    .topbar-tools {
+        gap: 6px;
+    }
+
+    .topbar-tools > .btn {
+        display: none;
+    }
+
+    .sidebar {
+        width: min(84vw, var(--sidebar-w));
+    }
 }

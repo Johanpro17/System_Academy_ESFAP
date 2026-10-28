@@ -10,9 +10,9 @@
     --brand-dark: #5b21b6;
     --brand-light: #f1ecff;
     --gold: #c8a24a;
-    --line: #e4e9f2;
+    --line: #e9e3f3;
     --bg: #ffffff;
-    --bg-alt: #f5f7fb;
+    --bg-alt: #f7f4fc;
     --radius: 18px;
     --radius-lg: 28px;
     --shadow-sm: 0 4px 14px rgba(11, 18, 32, .06);
@@ -169,7 +169,7 @@ a {
 .btn-outline {
     background: #fff;
     color: var(--ink);
-    border-color: #cfd8e8;
+    border-color: #d5cce6;
     box-shadow: var(--shadow-sm);
 }
 
@@ -699,7 +699,7 @@ a {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1;
-    color: var(--gold);
+    color: #a8842c;
     margin-bottom: 14px;
 }
 
@@ -837,7 +837,7 @@ a {
 
 .footer {
     background: var(--ink);
-    color: #cbd5e1;
+    color: #cfc7de;
     padding: 44px 0 32px;
 }
 
@@ -872,7 +872,7 @@ a {
 
 .footer-brand span {
     font-size: .76rem;
-    color: #94a3b8;
+    color: #a99cc4;
 }
 
 .footer-links {
@@ -892,7 +892,7 @@ a {
     padding-top: 20px;
     margin-top: 6px;
     font-size: .82rem;
-    color: #7c8ba1;
+    color: #8d81a8;
 }
 
 /* ---------- Responsive ---------- */
