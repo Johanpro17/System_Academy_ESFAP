@@ -89,6 +89,7 @@ El esquema está preparado para crecer:
 ## Documentación
 
 - [`docs/BASE_DE_DATOS.md`](docs/BASE_DE_DATOS.md): dónde vive la base y cómo se conecta el sistema.
+- [`docs/ESQUEMA_V3.md`](docs/ESQUEMA_V3.md): base nueva `escuela_artistica_v3` y equivalencias con el esquema actual.
 - [`docs/README_PROFESIONAL.md`](docs/README_PROFESIONAL.md): guía funcional, roles, backups y monitoreo.
 - [`docs/ESTADO.md`](docs/ESTADO.md): arquitectura actual y verificaciones.
 - [`docs/TODO.md`](docs/TODO.md): pendientes y siguientes pasos.

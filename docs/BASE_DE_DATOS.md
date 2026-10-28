@@ -21,12 +21,16 @@ logs/       registro de errores de la aplicación
 
 No hay archivos de la base sueltos en el proyecto. Esa separación es intencional.
 
-### Copia dentro de `Database/`
+### Copias dentro de `Database/`
 
-`Database/escuela_artistica.sql` es una copia de lectura para revisar el esquema y los
-datos desde VS Code. No es la base viva y no debe importarse sobre `escuela_artistica`
-sin querer reemplazarla. La carpeta se bloquea por HTTP y el `.sql` está excluido de Git
-porque contiene datos personales.
+| Archivo | Contenido |
+| --- | --- |
+| `Database/escuela_artistica.sql` | Copia de la base actual (15 tablas). |
+| `Database/escuela_artistica_v3.sql` | Copia de la base nueva propuesta (19 tablas + 2 vistas). |
+
+Son copias de lectura para revisar el esquema y los datos desde VS Code. No son la base
+viva y no deben importarse sobre `escuela_artistica` sin querer reemplazarla. La carpeta
+se bloquea por HTTP y los `.sql` están excluidos de Git porque contienen datos personales.
 
 ## Cómo se conecta el sistema
 
@@ -90,6 +94,20 @@ contraseña, no `root`.
 | Comunicación | `noticias`, `notificaciones` |
 | Control | `auditoria`, `login_intentos` |
 | Vista | `v_promedio_por_curso` |
+
+## Base nueva `escuela_artistica_v3`
+
+Existe una segunda base, separada de la actual, con el esquema propuesto y los datos
+migrados:
+
+- Se crea con `scripts/esquema_v3.sql`.
+- Contiene 19 tablas y 2 vistas (`v_alumnos`, `v_promedio_por_curso`).
+- Tiene los 120 alumnos, 6 especialidades, 7 cursos, 6 docentes, matrículas, notas,
+  horarios y auditoría.
+- No reemplaza a `escuela_artistica`: el sistema sigue conectado a la base actual.
+
+Los detalles, equivalencias de tablas y pasos para migrar el código están en
+[`docs/ESQUEMA_V3.md`](ESQUEMA_V3.md).
 
 ## Respaldos
 
