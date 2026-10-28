@@ -60,8 +60,7 @@ function nav_link(string $clave, string $ruta, string $texto, string $actual, ar
 }
 
 $esAdmin      = Auth::es_admin();
-$esDocente    = Auth::es_docente();
-$esEstudiante = Auth::es_estudiante();
+$esProfesor   = Auth::es_profesor();
 $esSecretaria = Auth::es_secretaria();
 $esAuditoria  = Auth::es_auditoria();
 $rol          = Auth::rol();
@@ -92,13 +91,7 @@ $rol          = Auth::rol();
             </div>
 
             <nav class="sidebar-nav" aria-label="Navegación del panel">
-                <?php if ($esEstudiante): ?>
-                    <?php nav_link('notas', 'views/estudiantes/mis_calificaciones.php', 'Mis calificaciones', $paginaActual, $iconos); ?>
-                    <div class="nav-label">Cuenta</div>
-                    <?php nav_link('perfil', 'perfil.php', 'Mi perfil', $paginaActual, $iconos); ?>
-                    <?php nav_link('salir', 'logout.php', 'Cerrar sesión', $paginaActual, $iconos); ?>
-                <?php else: ?>
-                    <?php nav_link('dashboard', $esDocente ? 'docente.php' : 'dashboard.php', 'Resumen', $paginaActual, $iconos); ?>
+                    <?php nav_link('dashboard', $esProfesor ? 'profesor.php' : 'dashboard.php', 'Resumen', $paginaActual, $iconos); ?>
 
                     <div class="nav-label">Registros</div>
                     <?php if (Auth::puede('estudiantes.ver')): ?>
@@ -146,7 +139,6 @@ $rol          = Auth::rol();
                     <div class="nav-label">Cuenta</div>
                     <?php nav_link('perfil', 'perfil.php', 'Mi perfil', $paginaActual, $iconos); ?>
                     <?php nav_link('salir', 'logout.php', 'Cerrar sesión', $paginaActual, $iconos); ?>
-                <?php endif; ?>
             </nav>
 
             <div class="sidebar-foot">

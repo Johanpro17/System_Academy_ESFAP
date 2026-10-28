@@ -47,8 +47,8 @@ if (es_post()) {
     if ($nombres === '' || $apellidos === '') {
         $errores[] = 'El nombre y los apellidos son obligatorios.';
     }
-    if ($cuenta && (int) $cuenta['id_rol'] !== Auth::ROL_DOCENTE) {
-        $errores[] = 'La cuenta vinculada ya no tiene el perfil Docente. Corrige el perfil desde Administración → Usuarios.';
+    if ($cuenta && (int) $cuenta['id_rol'] !== Auth::ROL_PROFESOR) {
+        $errores[] = 'La cuenta vinculada ya no tiene el perfil Profesor. Corrige el perfil desde Administración → Usuarios.';
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errores[] = 'Indica un correo electrónico válido para la cuenta del profesor.';
@@ -63,7 +63,7 @@ if (es_post()) {
     $usuarioPorCorreo = $email !== ''
         ? db()->fila("SELECT id_usuario, id_rol FROM usuarios WHERE email = :e", [':e' => $email])
         : null;
-    if ($usuarioPorCorreo && (int) $usuarioPorCorreo['id_rol'] !== Auth::ROL_DOCENTE) {
+    if ($usuarioPorCorreo && (int) $usuarioPorCorreo['id_rol'] !== Auth::ROL_PROFESOR) {
         $errores[] = 'Ese correo ya pertenece a una cuenta con otro perfil.';
     }
     if ($usuarioPorCorreo && (int) $usuarioPorCorreo['id_usuario'] !== $idUsuarioActual) {
@@ -101,7 +101,7 @@ if (es_post()) {
                     ':t' => $telefono ?: null,
                     ':ac' => $activo,
                     ':id' => $idUsuarioActual,
-                    ':rol' => Auth::ROL_DOCENTE,
+                    ':rol' => Auth::ROL_PROFESOR,
                 ];
                 if ($password !== '') {
                     $paramsCuenta[':h'] = password_hash($password, PASSWORD_DEFAULT);
@@ -120,7 +120,7 @@ if (es_post()) {
                     ':t' => $telefono ?: null,
                     ':ac' => $activo,
                     ':id' => $usuarioPorCorreo['id_usuario'],
-                    ':rol' => Auth::ROL_DOCENTE,
+                    ':rol' => Auth::ROL_PROFESOR,
                 ]);
                 $idUsuario = (int) $usuarioPorCorreo['id_usuario'];
             } else {
@@ -132,7 +132,7 @@ if (es_post()) {
                     ':a' => $apellidos,
                     ':e' => $email,
                     ':h' => password_hash($password, PASSWORD_DEFAULT),
-                    ':r' => Auth::ROL_DOCENTE,
+                    ':r' => Auth::ROL_PROFESOR,
                     ':t' => $telefono ?: null,
                     ':ac' => $activo,
                 ]);
@@ -179,7 +179,7 @@ if (es_post()) {
                 $editando ? 'editar' : 'crear',
                 'profesores',
                 $idProfesor,
-                "Docente {$nombres} {$apellidos} " . ($editando ? 'actualizado' : 'creado') . ' con cuenta vinculada'
+                "Profesor {$nombres} {$apellidos} " . ($editando ? 'actualizado' : 'creado') . ' con cuenta vinculada'
             );
             flash_set('success', $editando
                 ? 'Profesor y cuenta de acceso actualizados correctamente.'
@@ -198,7 +198,7 @@ if (es_post()) {
 }
 
 $titulo    = $editando ? 'Editar profesor' : 'Nuevo profesor';
-$subtitulo = $editando ? $profesor['nombres'] . ' ' . $profesor['apellidos'] : 'Registra un docente en la plantilla';
+$subtitulo = $editando ? $profesor['nombres'] . ' ' . $profesor['apellidos'] : 'Registra un profesor en la plantilla';
 $seccion   = 'profesores';
 $ancho     = 'content-narrow';
 
@@ -208,8 +208,8 @@ require_once APP_ROOT . '/layout/header.php';
 <div class="panel">
     <div class="panel-head">
         <div>
-            <h2><?= $editando ? 'Editar docente' : 'Registrar docente' ?></h2>
-            <p>Datos del docente y credenciales personales de acceso</p>
+            <h2><?= $editando ? 'Editar profesor' : 'Registrar profesor' ?></h2>
+            <p>Datos del profesor y credenciales personales de acceso</p>
         </div>
         <div class="panel-actions">
             <a class="btn btn-ghost btn-sm" href="listar.php">Volver al listado</a>
@@ -272,7 +272,7 @@ require_once APP_ROOT . '/layout/header.php';
                     <div class="field">
                         <label for="email">Correo de acceso *</label>
                         <input class="input" type="email" id="email" name="email" maxlength="150" required
-                            value="<?= e($datos['email']) ?>" placeholder="docente@escuela.edu">
+                            value="<?= e($datos['email']) ?>" placeholder="profesor@escuela.edu">
                     </div>
                     <div class="field">
                         <label for="telefono">Teléfono</label>
@@ -287,8 +287,8 @@ require_once APP_ROOT . '/layout/header.php';
                         <?= $cuenta ? '' : 'required' ?> minlength="8" autocomplete="new-password">
                     <span class="hint">
                         <?= $cuenta
-                            ? 'Déjala vacía para conservar la actual. Si la cambias, comparte la nueva contraseña con el docente de forma segura.'
-                            : 'La cuenta se crea con rol Docente. Mínimo 8 caracteres, con letras y números.' ?>
+                            ? 'Déjala vacía para conservar la actual. Si la cambias, comparte la nueva contraseña con el profesor de forma segura.'
+                            : 'La cuenta se crea con rol Profesor. Mínimo 8 caracteres, con letras y números.' ?>
                     </span>
                 </div>
 
@@ -296,7 +296,7 @@ require_once APP_ROOT . '/layout/header.php';
                     <label class="switch">
                         <input type="checkbox" name="activo" value="1" <?= $datos['activo'] ? 'checked' : '' ?>>
                         <span class="track"></span>
-                        <span>Docente activo (disponible para asignación de cursos)</span>
+                        <span>Profesor activo (disponible para asignación de cursos)</span>
                     </label>
                 </div>
 

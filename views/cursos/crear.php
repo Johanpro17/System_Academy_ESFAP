@@ -200,7 +200,7 @@ require_once APP_ROOT . '/layout/header.php';
         <div class="course-editor-copy">
             <span class="eyebrow"><?= $editando ? 'Edición de catálogo' : 'Catálogo académico' ?></span>
             <h2><?= $editando ? 'Edita el curso' : 'Crea un curso nuevo' ?></h2>
-            <p>Completa la información y asigna los docentes que podrán gestionar sus evaluaciones y calificaciones.</p>
+            <p>Completa la información y asigna los profesores que podrán gestionar sus evaluaciones y calificaciones.</p>
         </div>
         <a class="btn btn-ghost btn-sm course-back" href="listar.php">Volver a cursos</a>
     </div>
@@ -279,7 +279,7 @@ require_once APP_ROOT . '/layout/header.php';
                     <div class="course-section-heading">
                         <span class="course-section-number">02</span>
                         <div>
-                            <h3 id="course-teachers-title">Asignación de docentes</h3>
+                            <h3 id="course-teachers-title">Asignación de profesores</h3>
                             <p>Selecciona quién podrá ver este curso y registrar sus notas.</p>
                         </div>
                         <span class="teacher-count" data-docentes-seleccionados aria-live="polite">
@@ -290,7 +290,7 @@ require_once APP_ROOT . '/layout/header.php';
 
                     <?php if (!$docentes): ?>
                         <div class="teacher-empty">
-                            <strong>Aún no hay docentes disponibles</strong>
+                            <strong>Aún no hay profesores disponibles</strong>
                             <span>Registra primero un profesor activo desde el módulo Profesores.</span>
                         </div>
                     <?php else: ?>
@@ -325,8 +325,8 @@ require_once APP_ROOT . '/layout/header.php';
                                 </label>
                             <?php endforeach; ?>
                         </div>
-                        <p class="hint teacher-hint">Los docentes inactivos solo se pueden conservar en cursos donde ya estaban asignados.</p>
-                        <p class="teacher-no-results" data-docentes-sin-resultados hidden>No hay docentes que coincidan con la búsqueda.</p>
+                        <p class="hint teacher-hint">Los profesores inactivos solo se pueden conservar en cursos donde ya estaban asignados.</p>
+                        <p class="teacher-no-results" data-docentes-sin-resultados hidden>No hay profesores que coincidan con la búsqueda.</p>
                     <?php endif; ?>
                 </section>
 

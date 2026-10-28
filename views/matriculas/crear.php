@@ -14,13 +14,12 @@ $errores = [];
 /* Matrícula del estudiante, con DNI y especialidad, agrupadas por especialidad. */
 $estudiantes = db()->todas(
     "SELECT e.id_estudiante, e.matricula, e.dni,
-            CONCAT(u.nombres,' ',u.apellidos) AS nombre,
+            CONCAT(e.nombres,' ',e.apellidos) AS nombre,
             esp.id_especialidad, esp.nombre AS especialidad
        FROM estudiantes e
-       JOIN usuarios u ON u.id_usuario = e.id_usuario
        JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad
       WHERE e.estado = 'activo'
-      ORDER BY esp.nombre ASC, u.apellidos ASC, u.nombres ASC"
+      ORDER BY esp.nombre ASC, e.apellidos ASC, e.nombres ASC"
 );
 
 $porEspecialidad = [];
@@ -76,14 +75,6 @@ if (es_post()) {
 
             $idMatricula = (int) db()->conectar()->lastInsertId();
             Auth::registrar('crear', 'matriculas', $idMatricula, "Matrícula {$periodo} creada");
-
-            Notificacion::crear(
-                (int) db()->valor("SELECT id_usuario FROM estudiantes WHERE id_estudiante = :e", [':e' => $idEstudiante]),
-                'Nueva matrícula registrada',
-                'Tu inscripción en el periodo ' . $periodo . ' fue registrada correctamente.',
-                'success',
-                'public/dashboard.php'
-            );
 
             flash_set('success', 'Matrícula registrada correctamente.');
             redirigir('constancia.php?id=' . $idMatricula);

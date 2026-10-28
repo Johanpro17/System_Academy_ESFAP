@@ -41,10 +41,10 @@ $filtros = [];
 $join    = '';
 
 if ($q !== '') {
-    $filtros["CONCAT(u.nombres,' ',u.apellidos)"] = ['like', $q];
-    $filtros['u.email']                            = ['like', $q];
-    $filtros['e.matricula']                        = ['like', $q];
-    $filtros['e.dni']                              = ['like', $q];
+    $filtros["CONCAT(e.nombres,' ',e.apellidos)"] = ['like', $q];
+    $filtros['e.email']                           = ['like', $q];
+    $filtros['e.matricula']                       = ['like', $q];
+    $filtros['e.dni']                             = ['like', $q];
 }
 if ($especialidad > 0) {
     $filtros['e.id_especialidad'] = $especialidad;
@@ -53,11 +53,10 @@ if ($estado !== '') {
     $filtros['e.estado'] = $estado;
 }
 
-$join = 'INNER JOIN usuarios u ON u.id_usuario = e.id_usuario
-         INNER JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
+$join = 'INNER JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
 
-$soloDocente = Auth::es_docente();
-if ($soloDocente) {
+$soloProfesor = Auth::es_profesor();
+if ($soloProfesor) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]
@@ -75,8 +74,8 @@ $paginador = new Paginador($total, $porPagina, $pag);
 
 $columnas = [
     'e.id_estudiante',
-    'CONCAT(u.nombres," ",u.apellidos) AS nombre',
-    'u.email',
+    'CONCAT(e.nombres," ",e.apellidos) AS nombre',
+    'e.email',
     'e.dni',
     'e.matricula',
     'esp.nombre AS especialidad',
@@ -85,7 +84,7 @@ $columnas = [
     'e.id_usuario',
 ];
 
-$orden = 'e.estado ASC, u.apellidos ASC';
+$orden = 'e.estado ASC, e.apellidos ASC, e.nombres ASC';
 
 $registros = Paginador::obtener('estudiantes e', $columnas, $filtros, $orden, $porPagina, $paginador->offset(), $join)->fetchAll();
 
@@ -118,7 +117,7 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-head">
         <div>
             <h2>Padrón de estudiantes</h2>
-            <p><?= $soloDocente
+            <p><?= $soloProfesor
                 ? 'Estudiantes inscritos en tus cursos asignados'
                 : 'Busca por nombre, correo, matrícula o DNI' ?></p>
         </div>

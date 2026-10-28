@@ -10,8 +10,8 @@ Auth::requerir_permiso('horarios.ver');
 
 $periodo = input('periodo') ?: date('Y') . '-1';
 $idCurso = input_int('curso');
-$soloDocente = Auth::es_docente();
-$idProfesor = $soloDocente ? db()->valor(
+$soloProfesor = Auth::es_profesor();
+$idProfesor = $soloProfesor ? db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 ) : null;
@@ -35,7 +35,7 @@ $normalizarDia = static function (string $dia): string {
 };
 $franjas = ['07:00', '09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
 
-if (!$soloDocente) {
+if (!$soloProfesor) {
     $cursos = db()->todas("SELECT id_curso, codigo, nombre FROM cursos WHERE activo = 1 ORDER BY nombre ASC");
 } elseif ($idProfesor) {
     $cursos = db()->todas(
@@ -50,7 +50,7 @@ if (!$soloDocente) {
     $cursos = [];
 }
 
-if ($idCurso && $soloDocente && !in_array($idCurso, array_map('intval', array_column($cursos, 'id_curso')), true)) {
+if ($idCurso && $soloProfesor && !in_array($idCurso, array_map('intval', array_column($cursos, 'id_curso')), true)) {
     $idCurso = 0;
 }
 
@@ -70,13 +70,13 @@ try {
            JOIN profesores p ON p.id_profesor = h.id_profesor
           WHERE h.periodo = :p"
             . ($idCurso ? ' AND h.id_curso = :c' : '')
-            . ($soloDocente ? ' AND h.id_profesor = :profesor' : '') . "
+            . ($soloProfesor ? ' AND h.id_profesor = :profesor' : '') . "
           ORDER BY FIELD(h.dia_semana,'Lunes','Martes','Miércoles','Miercoles','Jueves','Viernes','Sábado','Sabado','Domingo'),
                    h.hora_inicio",
         array_merge(
             [':p' => $periodo],
             $idCurso ? [':c' => $idCurso] : [],
-            $soloDocente ? [':profesor' => $idProfesor ?? 0] : []
+            $soloProfesor ? [':profesor' => $idProfesor ?? 0] : []
         )
     );
 } catch (Throwable $e) {
@@ -166,7 +166,7 @@ require_once APP_ROOT . '/layout/header.php';
 
     <?php if ($cargaDocente): ?>
         <span class="muted small nowrap">
-            <?= count($cargaDocente) ?> docente(s) con carga asignada
+            <?= count($cargaDocente) ?> profesor(es) con carga asignada
         </span>
     <?php endif; ?>
 </div>
@@ -239,7 +239,7 @@ require_once APP_ROOT . '/layout/header.php';
         <div class="panel">
             <div class="panel-head">
                 <div>
-                    <h2>Carga horaria docente</h2>
+                    <h2>Carga horaria por profesor</h2>
                     <p>Horas semanales asignadas</p>
                 </div>
             </div>
@@ -277,7 +277,7 @@ require_once APP_ROOT . '/layout/header.php';
                         <thead>
                             <tr>
                                 <th>Curso</th>
-                                <th>Docente</th>
+                                <th>Profesor</th>
                                 <th>Horario</th>
                             </tr>
                         </thead>

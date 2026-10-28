@@ -24,12 +24,12 @@ if (!isset($titulos[$tipo])) {
     exit('Tipo de exportación no válido.');
 }
 
-$verTodo = !Auth::es_docente();
+$verTodo = !Auth::es_profesor();
 $idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 );
-if (Auth::es_docente() && $tipo === 'profesores') {
+if (Auth::es_profesor() && $tipo === 'profesores') {
     http_response_code(403);
     exit('No tienes permiso para exportar el padrón de profesores.');
 }
@@ -38,15 +38,15 @@ switch ($tipo) {
     case 'estudiantes':
         $filtros = [];
         if ($q !== '') {
-            $filtros["CONCAT(u.nombres,' ',u.apellidos)"] = ['like', $q];
+            $filtros["CONCAT(e.nombres,' ',e.apellidos)"] = ['like', $q];
             $filtros['e.matricula']                       = ['like', $q];
             $filtros['e.dni']                             = ['like', $q];
+            $filtros['e.email']                           = ['like', $q];
         }
         $columnas = ['e.dni', 'e.matricula', 'e.anio_ingreso', 'e.estado',
-                     "CONCAT(u.nombres,' ',u.apellidos) AS estudiante", 'u.email', 'u.telefono',
+                     "CONCAT(e.nombres,' ',e.apellidos) AS estudiante", 'e.email', 'e.telefono',
                      'esp.nombre AS especialidad'];
-        $join = 'JOIN usuarios u ON u.id_usuario = e.id_usuario
-                 JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
+        $join = 'JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
         if (!$verTodo) {
             $join .= ' JOIN (
                 SELECT DISTINCT m.id_estudiante
@@ -59,7 +59,7 @@ switch ($tipo) {
             'estudiantes e',
             $columnas,
             $filtros,
-            'u.apellidos ASC',
+            'e.apellidos ASC, e.nombres ASC',
             5000,
             0,
             $join
@@ -97,13 +97,12 @@ switch ($tipo) {
         $periodo = input('periodo') ?: '';
         $filtros = [];
         if ($q !== '') {
-            $filtros["CONCAT(u.nombres,' ',u.apellidos)"] = ['like', $q];
+            $filtros["CONCAT(e.nombres,' ',e.apellidos)"] = ['like', $q];
         }
         if ($periodo !== '') {
             $filtros['m.periodo'] = $periodo;
         }
         $join = 'JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
-                 JOIN usuarios u ON u.id_usuario = e.id_usuario
                  JOIN cursos c ON c.id_curso = m.id_curso';
         if (!$verTodo) {
             $join .= ' JOIN curso_docentes cd ON cd.id_curso = m.id_curso';
@@ -111,7 +110,7 @@ switch ($tipo) {
         }
         $filas = Paginador::obtener(
             'matriculas m',
-            ["CONCAT(u.nombres,' ',u.apellidos) AS estudiante", 'e.matricula', 'c.nombre AS curso',
+            ["CONCAT(e.nombres,' ',e.apellidos) AS estudiante", 'e.matricula', 'c.nombre AS curso',
              'm.periodo', 'm.estado', 'm.fecha_matricula'],
             $filtros,
             'm.fecha_matricula DESC',
@@ -129,7 +128,6 @@ switch ($tipo) {
             $filtros['n.periodo'] = $periodo;
         }
         $join = 'JOIN estudiantes e ON e.id_estudiante = n.id_estudiante
-                 JOIN usuarios u ON u.id_usuario = e.id_usuario
                  JOIN cursos c ON c.id_curso = n.id_curso
                  JOIN evaluaciones ev ON ev.id_evaluacion = n.id_evaluacion';
         if (!$verTodo) {
@@ -138,10 +136,10 @@ switch ($tipo) {
         }
         $filas = Paginador::obtener(
             'notas n',
-            ["CONCAT(u.nombres,' ',u.apellidos) AS estudiante", 'e.matricula', 'c.nombre AS curso',
+            ["CONCAT(e.nombres,' ',e.apellidos) AS estudiante", 'e.matricula', 'c.nombre AS curso',
              'ev.nombre AS evaluacion', 'ev.peso', 'n.periodo', 'n.valor'],
             $filtros,
-            'u.apellidos ASC, c.nombre ASC',
+            'e.apellidos ASC, c.nombre ASC',
             10000,
             0,
             $join

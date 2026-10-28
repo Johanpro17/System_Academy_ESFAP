@@ -12,7 +12,7 @@ $periodo = input('periodo') ?: date('Y') . '-1';
 $q       = input('q');
 $minimo  = input('minimo');
 
-$verTodo = !Auth::es_docente();
+$verTodo = !Auth::es_profesor();
 $idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]

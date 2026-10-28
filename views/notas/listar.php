@@ -11,13 +11,13 @@ Auth::requerir_permiso('notas.ver');
 $errores = [];
 
 $puedeEditar = Auth::puede('notas.editar');
-$soloDocente = Auth::es_docente();
-$idProfesor = $soloDocente ? db()->valor(
+$soloProfesor = Auth::es_profesor();
+$idProfesor = $soloProfesor ? db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 ) : null;
 
-if (!$soloDocente) {
+if (!$soloProfesor) {
     $cursos = db()->todas("SELECT id_curso, codigo, nombre FROM cursos WHERE activo = 1 ORDER BY nombre ASC");
     $evaluaciones = db()->todas("SELECT id_evaluacion, id_curso, nombre, peso FROM evaluaciones ORDER BY nombre ASC");
 } elseif ($idProfesor) {
@@ -43,8 +43,8 @@ if (!$soloDocente) {
     $errores[] = 'Tu cuenta todavía no está vinculada a una ficha de profesor activa.';
 }
 
-$cursoPermitido = static function (int $curso) use ($soloDocente, $idProfesor): bool {
-    if (!$soloDocente) {
+$cursoPermitido = static function (int $curso) use ($soloProfesor, $idProfesor): bool {
+    if (!$soloProfesor) {
         return $curso > 0;
     }
     if (!$idProfesor) {
@@ -215,12 +215,11 @@ if ($idCurso && !$cursoPermitido($idCurso)) {
 $estudiantes = [];
 if ($idCurso) {
     $estudiantes = db()->todas(
-        "SELECT e.id_estudiante, CONCAT(u.nombres,' ',u.apellidos) AS nombre
+        "SELECT e.id_estudiante, CONCAT(e.nombres,' ',e.apellidos) AS nombre
            FROM matriculas m
            JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
-           JOIN usuarios u ON u.id_usuario = e.id_usuario
           WHERE m.id_curso = :c AND m.periodo = :p
-          ORDER BY u.apellidos, u.nombres",
+          ORDER BY e.apellidos, e.nombres",
         [':c' => $idCurso, ':p' => $periodo]
     );
 }
@@ -351,7 +350,7 @@ require_once APP_ROOT . '/layout/header.php';
                             </tbody>
                         </table>
                     </div>
-                    <p class="muted small mt-2">Consulta de solo lectura. La edición de notas está reservada a docentes y administradores.</p>
+                    <p class="muted small mt-2">Consulta de solo lectura. La edición de notas está reservada a profesores y administradores.</p>
                 <?php else: ?>
                 <form method="POST" novalidate>
                     <?= csrf_input() ?>

@@ -1,49 +1,27 @@
-# TODO - Correcciones de Seguridad y Funcionalidad
+# Pendientes y siguientes pasos
 
-## Plan de Correcciones
+## Plataforma de alumnos (fuera de este sistema)
 
-### Fase 1: Core de Autenticación ✅ COMPLETADO
-- [x] `public/login.php` - Agregar session_start(), redirección si ya logueado, mejorar HTML
-- [x] `controllers/AuthController.php` - Regenerar ID de sesión (anti session fixation), agregar exit
-- [x] `public/index.php` - Redirección a dashboard si ya logueado
+- Crear el panel independiente para alumnos con correo y contraseña propios.
+- Definir cómo se vinculará cada cuenta nueva con su ficha en `estudiantes` (por DNI o matrícula).
+- Las cuentas históricas de alumno ya están desactivadas y sin rol; no es necesario borrarlas.
 
-### Fase 2: Vistas Listar (Session + XSS) ✅ COMPLETADO
-- [x] `views/estudiantes/listar.php` - Verificación de sesión + htmlspecialchars
-- [x] `views/cursos/listar.php` - Verificación de sesión + htmlspecialchars
-- [x] `views/matriculas/listar.php` - Verificación de sesión + htmlspecialchars
-- [x] `views/profesores/listar.php` - Verificación de sesión + htmlspecialchars
+## Operación académica
 
-### Fase 3: Vistas Crear (Session + XSS + Exit) ✅ COMPLETADO
-- [x] `views/estudiantes/crear.php` - Verificación de sesión + htmlspecialchars + exit
-- [x] `views/cursos/crear.php` - Verificación de sesión + exit
-- [x] `views/matriculas/crear.php` - Verificación de sesión + exit
-- [x] `views/profesores/crear.php` - Verificación de sesión + exit
+- Importación masiva de fichas de alumno (CSV o base externa) sin crear cuentas de acceso.
+- Validar el formato de DNI por país antes de endurecer la regla actual.
+- Programar `scripts/respaldo_bd.php` con el Programador de tareas de Windows y copiar los respaldos fuera del servidor.
+- Revisar periódicamente el crecimiento de `auditoria`, `login_intentos` y `notificaciones`.
 
-### Fase 4: Otras Vistas ✅ COMPLETADO
-- [x] `views/horarios/ver.php` - Verificación de sesión
-- [x] `views/estudiantes/reportes/promedios.php` - Verificación de sesión + mensaje de error amigable
-- [x] `views/reportes/generar.php` - Mejorar estructura HTML y enlaces corregidos
+## Infraestructura
 
-### Fase 5: Documentación ✅ COMPLETADO
-- [x] `public/instalar.php` - Documentar como esquema oficial, advertencia sobre SQL dump incompatible
+- Publicar bajo HTTPS y ajustar `config/config.php` para producción (`debug = false`).
+- Definir política de contraseñas y rotación de las cuentas institucionales.
+- Documentar el procedimiento de restauración de un respaldo.
 
----
+## Completado
 
-## Resumen de Cambios Realizados
-
-### Seguridad Implementada:
-1. **Autenticación obligatoria:** Todas las vistas ahora verifican `$_SESSION['user']` y redirigen al login si no hay sesión
-2. **Protección XSS:** Todas las salidas de datos usan `htmlspecialchars()` para prevenir inyección de código JavaScript
-3. **Session Fixation:** El `AuthController` ahora usa `session_regenerate_id(true)` después del login
-4. **Redirecciones seguras:** Todas las redirecciones con `header()` incluyen `exit` para detener la ejecución
-
-### Mejoras Funcionales:
-1. **Login mejorado:** Formulario HTML completo con manejo de errores, redirección si ya está logueado
-2. **Index protegido:** Redirige a dashboard si el usuario ya tiene sesión activa
-3. **Reporte de promedios:** Maneja gracefulmente el error cuando no existe la vista `v_promedio_por_curso` (esquema simple vs dump)
-4. **Instalador documentado:** Comentarios explicativos sobre qué esquema usar y por qué no usar el SQL dump
-
-### Nota Importante sobre Base de Datos:
-- **Usar:** `public/instalar.php` + `public/seed.php` → Crea el esquema SIMPLE compatible con el código PHP
-- **NO usar:** `escuela_artistica (1).sql` → Esquema complejo incompatible (tablas `docentes` vs `profesores`, `matricula_cursos` separada, etc.)
-- El reporte de promedios requiere importar el dump SQL completo para funcionar (incluye tabla `evaluaciones`, `notas`, vista `v_promedio_por_curso`)
+- Cuatro roles de sistema y retiro del rol Estudiante.
+- Ficha de alumno independiente de la cuenta de usuario.
+- Esquema normalizado en `utf8mb4`, con índices y claves foráneas.
+- Limpieza del árbol: sin `legado/`, sin scripts de una sola vez y con las imágenes en `public/assets/img/`.

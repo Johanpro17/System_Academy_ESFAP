@@ -41,7 +41,7 @@ $tabla = 'cursos c';
 $join = '';
 $filtros = [];
 $idProfesor = null;
-if (Auth::es_docente()) {
+if (Auth::es_profesor()) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]

@@ -49,8 +49,8 @@ $porPagina = 12;
 
 $filtros = [];
 if ($q !== '') {
-    $filtros["CONCAT(u.nombres,' ',u.apellidos)"] = ['like', $q];
-    $filtros['c.nombre']                          = ['like', $q];
+    $filtros["CONCAT(e.nombres,' ',e.apellidos)"] = ['like', $q];
+    $filtros['c.nombre']                           = ['like', $q];
 }
 if ($periodo !== '') {
     $filtros['m.periodo'] = $periodo;
@@ -60,11 +60,10 @@ if ($estado !== '') {
 }
 
 $join = 'JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
-         JOIN usuarios u ON u.id_usuario = e.id_usuario
          JOIN cursos c ON c.id_curso = m.id_curso';
 
-$soloDocente = Auth::es_docente();
-if ($soloDocente) {
+$soloProfesor = Auth::es_profesor();
+if ($soloProfesor) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]
@@ -78,7 +77,7 @@ $paginador = new Paginador($total, $porPagina, $pag);
 
 $columnas = [
     'm.id_matricula',
-    'CONCAT(u.nombres," ",u.apellidos) AS estudiante',
+    'CONCAT(e.nombres," ",e.apellidos) AS estudiante',
     'c.nombre AS curso',
     'm.periodo',
     'm.estado',
@@ -90,7 +89,7 @@ $orden    = 'm.fecha_matricula DESC';
 
 $registros = Paginador::obtener('matriculas m', $columnas, $filtros, $orden, $porPagina, $paginador->offset(), $join)->fetchAll();
 
-$periodos = !$soloDocente
+$periodos = !$soloProfesor
     ? db()->todas("SELECT DISTINCT periodo FROM matriculas ORDER BY periodo DESC")
     : db()->todas(
         "SELECT DISTINCT m.periodo
@@ -126,7 +125,7 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-head">
         <div>
             <h2>Inscripciones</h2>
-            <p><?= $soloDocente
+            <p><?= $soloProfesor
                 ? 'Inscripciones de tus cursos asignados · solo lectura'
                 : 'Estudiantes inscritos por curso y periodo' ?></p>
         </div>

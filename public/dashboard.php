@@ -9,12 +9,8 @@ require_once __DIR__ . '/../core/bootstrap.php';
 Auth::requerir_login();
 refrescar_usuario();
 
-if (Auth::es_estudiante()) {
-    redirigir(base_url('views/estudiantes/mis_calificaciones.php'));
-}
-
-if (Auth::es_docente()) {
-    redirigir(base_url('docente.php'));
+if (Auth::es_profesor()) {
+    redirigir(base_url('profesor.php'));
 }
 
 if (!Auth::puede('dashboard.ver')) {
@@ -36,7 +32,7 @@ $totales = [
     'profesores'  => (int) db()->valor("SELECT COUNT(*) FROM profesores WHERE activo = 1", [], 0),
     'matriculas'  => (int) db()->valor("SELECT COUNT(*) FROM matriculas", [], 0),
     'evaluaciones'=> (int) db()->valor("SELECT COUNT(*) FROM evaluaciones", [], 0),
-    'usuarios'    => (int) db()->valor("SELECT COUNT(*) FROM usuarios WHERE activo = 1", [], 0),
+    'usuarios'    => (int) db()->valor("SELECT COUNT(*) FROM usuarios WHERE activo = 1 AND id_rol IS NOT NULL", [], 0),
 ];
 
 $promedioGeneral = (float) db()->valor(
@@ -117,11 +113,10 @@ $maxPeriodo = max(1, ...array_map(static fn($f) => (int) $f['total'], $porPeriod
 $ultimasMatriculas = [];
 try {
     $ultimasMatriculas = db()->todas(
-        "SELECT CONCAT(u.nombres,' ',u.apellidos) AS estudiante,
+        "SELECT CONCAT(e.nombres,' ',e.apellidos) AS estudiante,
                 c.nombre AS curso, m.periodo, m.fecha_matricula
            FROM matriculas m
            JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
-           JOIN usuarios u ON u.id_usuario = e.id_usuario
            JOIN cursos c ON c.id_curso = m.id_curso
           ORDER BY m.fecha_matricula DESC
           LIMIT 6"
@@ -261,7 +256,7 @@ require_once APP_ROOT . '/layout/header.php';
         </span>
         <div>
             <div class="kpi-value"><?= number_format($totales['profesores'], 0, ',', '.') ?></div>
-            <div class="kpi-label">Docentes</div>
+            <div class="kpi-label">Profesores</div>
         </div>
     </div>
 

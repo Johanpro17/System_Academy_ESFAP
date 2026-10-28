@@ -2,6 +2,9 @@
 
 /**
  * Edición de la ficha de un estudiante.
+ *
+ * Solo se editan los datos académicos y de contacto. La cuenta de acceso,
+ * si existiera, pertenece a otro panel y no se modifica desde aquí.
  */
 
 require_once __DIR__ . '/../../core/bootstrap.php';
@@ -11,10 +14,9 @@ Auth::requerir_permiso('estudiantes.editar');
 $id = input_int('id');
 
 $estudiante = db()->fila(
-    "SELECT e.id_estudiante, e.id_usuario, e.id_especialidad, e.dni, e.matricula, e.anio_ingreso, e.estado,
-            u.nombres, u.apellidos, u.email, u.telefono, u.activo
+    "SELECT e.id_estudiante, e.id_usuario, e.id_especialidad, e.dni, e.matricula,
+            e.anio_ingreso, e.estado, e.nombres, e.apellidos, e.email, e.telefono
        FROM estudiantes e
-       JOIN usuarios u ON u.id_usuario = e.id_usuario
       WHERE e.id_estudiante = :id",
     [':id' => $id]
 );
@@ -32,26 +34,21 @@ $especialidades = db()->todas("SELECT id_especialidad, nombre FROM especialidade
 if (es_post()) {
     exigir_post();
 
-    $idEspecialidad = input_int('id_especialidad');
-    $matricula      = mb_strtoupper(input('matricula'));
-    $dni            = mb_substr(input('dni'), 0, 20);
-    $anioIngreso    = input_int('anio_ingreso');
-    $estado         = input('estado');
     $nombres        = trim(input('nombres'));
     $apellidos      = trim(input('apellidos'));
-    $email          = mb_strtolower(input('email'));
-    $telefono       = input('telefono');
-    $activo         = isset($_POST['activo']) ? 1 : 0;
+    $email          = mb_strtolower(trim(input('email')));
+    $telefono       = trim(input('telefono'));
+    $idEspecialidad = input_int('id_especialidad');
+    $matricula      = mb_strtoupper(trim(input('matricula')));
+    $dni            = mb_strtoupper(trim(input('dni')));
+    $anioIngreso    = input_int('anio_ingreso');
+    $estado         = input('estado');
 
     if ($nombres === '' || $apellidos === '') {
         $errores[] = 'El nombre y los apellidos son obligatorios.';
     }
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errores[] = 'El correo electrónico no es válido.';
-    }
-    if (db()->valor("SELECT id_usuario FROM usuarios WHERE email = :e AND id_usuario <> :id",
-        [':e' => $email, ':id' => $estudiante['id_usuario']])) {
-        $errores[] = 'Ese correo ya está en uso por otro usuario.';
     }
     if (!$idEspecialidad) {
         $errores[] = 'Selecciona una especialidad.';
@@ -76,45 +73,38 @@ if (es_post()) {
     }
 
     if (!$errores) {
-        $pdo = db()->conectar();
-
         try {
-            $pdo->beginTransaction();
-
-            $pdo->prepare(
-                "UPDATE usuarios SET nombres = :n, apellidos = :a, email = :e, telefono = :t, activo = :ac
-                  WHERE id_usuario = :id"
-            )->execute([
-                ':n'  => $nombres,
-                ':a'  => $apellidos,
-                ':e'  => $email,
-                ':t'  => $telefono ?: null,
-                ':ac' => $activo,
-                ':id' => $estudiante['id_usuario'],
-            ]);
-
-            $pdo->prepare(
+            db()->query(
                 "UPDATE estudiantes
-                    SET id_especialidad = :e, dni = :d, matricula = :m, anio_ingreso = :a, estado = :es
-                  WHERE id_estudiante = :id"
-            )->execute([
-                ':e'  => $idEspecialidad,
-                ':d'  => $dni ?: null,
-                ':m'  => $matricula ?: null,
-                ':a'  => $anioIngreso ?: null,
-                ':es' => $estado,
-                ':id' => $id,
-            ]);
-
-            $pdo->commit();
+                    SET nombres = :n, apellidos = :a, email = :e, telefono = :t,
+                        id_especialidad = :esp, dni = :d, matricula = :m,
+                        anio_ingreso = :anio, estado = :es
+                  WHERE id_estudiante = :id",
+                [
+                    ':n'    => $nombres,
+                    ':a'    => $apellidos,
+                    ':e'    => $email !== '' ? $email : null,
+                    ':t'    => $telefono !== '' ? $telefono : null,
+                    ':esp'  => $idEspecialidad,
+                    ':d'    => $dni !== '' ? $dni : null,
+                    ':m'    => $matricula !== '' ? $matricula : null,
+                    ':anio' => $anioIngreso ?: null,
+                    ':es'   => $estado,
+                    ':id'   => $id,
+                ]
+            );
 
             Auth::registrar('editar', 'estudiantes', $id, "Ficha de {$nombres} {$apellidos} actualizada");
 
-            flash_set('success', 'Estudiante actualizado correctamente.');
+            flash_set('success', 'Ficha del estudiante actualizada.');
             redirigir('listar.php');
-        } catch (Throwable $e) {
-            $pdo->rollBack();
-            $errores[] = 'Error al guardar: ' . $e->getMessage();
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                $errores[] = 'El DNI o la matrícula ya pertenecen a otra ficha.';
+            } else {
+                error_log('estudiantes/editar: ' . $e->getMessage());
+                $errores[] = 'No fue posible guardar los cambios. Inténtalo de nuevo.';
+            }
         }
     }
 
@@ -126,13 +116,13 @@ if (es_post()) {
         'id_especialidad' => $idEspecialidad,
         'matricula'       => $matricula,
         'anio_ingreso'    => $anioIngreso,
+        'dni'             => $dni,
         'estado'          => $estado,
-        'activo'          => $activo,
     ]);
 }
 
 $titulo    = 'Editar estudiante';
-$subtitulo = $estudiante['nombres'] . ' ' . $estudiante['apellidos'];
+$subtitulo = trim((string) $estudiante['nombres'] . ' ' . (string) $estudiante['apellidos']);
 $seccion   = 'estudiantes';
 $ancho     = 'content-narrow';
 
@@ -143,7 +133,7 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-head">
         <div>
             <h2>Editar ficha</h2>
-            <p>Los cambios afectan al usuario vinculado</p>
+            <p>Los cambios se guardan solo en la ficha académica del alumno</p>
         </div>
         <div class="panel-actions">
             <a class="btn btn-ghost btn-sm" href="listar.php">Volver al listado</a>
@@ -186,8 +176,8 @@ require_once APP_ROOT . '/layout/header.php';
 
                 <div class="form-row">
                     <div class="field">
-                        <label for="email">Correo electrónico *</label>
-                        <input class="input" type="email" id="email" name="email" required maxlength="150"
+                        <label for="email">Correo de contacto</label>
+                        <input class="input" type="email" id="email" name="email" maxlength="150"
                             value="<?= e($datos['email']) ?>">
                     </div>
                     <div class="field">
@@ -230,21 +220,21 @@ require_once APP_ROOT . '/layout/header.php';
 
                 <div class="form-row">
                     <div class="field">
-                        <label for="estado">Estado</label>
+                        <label for="estado">Estado académico</label>
                         <select class="input" id="estado" name="estado">
                             <option value="activo"   <?= $datos['estado'] === 'activo' ? 'selected' : '' ?>>Activo</option>
                             <option value="egresado" <?= $datos['estado'] === 'egresado' ? 'selected' : '' ?>>Egresado</option>
                             <option value="retirado" <?= $datos['estado'] === 'retirado' ? 'selected' : '' ?>>Retirado</option>
                         </select>
                     </div>
-                    <div class="field" style="justify-content:flex-end">
-                        <label class="switch">
-                            <input type="checkbox" name="activo" value="1"
-                                <?= $datos['activo'] ? 'checked' : '' ?>>
-                            <span class="track"></span>
-                            <span>Usuario activo (puede iniciar sesión)</span>
-                        </label>
-                    </div>
+                    <?php if (!empty($datos['id_usuario'])): ?>
+                        <div class="field" style="justify-content:flex-end">
+                            <span class="hint">
+                                Esta ficha conserva una cuenta histórica vinculada.
+                                Su acceso se gestiona en el panel de alumnos.
+                            </span>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="form-actions">

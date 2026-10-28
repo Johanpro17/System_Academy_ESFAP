@@ -9,12 +9,11 @@ require_once __DIR__ . '/../config/database.php';
 class Auth
 {
     public const ROL_ADMIN      = 1;
-    public const ROL_DOCENTE    = 2;
-    public const ROL_ESTUDIANTE = 3;
+    public const ROL_PROFESOR   = 2;
     public const ROL_SECRETARIA = 4;
     public const ROL_AUDITORIA  = 5;
 
-    /** Registro de roles: id => [nombre, clase, descripción] */
+    /** Registro de roles del sistema: id => [nombre, clase, descripción] */
     public static function roles(): array
     {
         return [
@@ -23,15 +22,10 @@ class Auth
                 'clase'       => 'rol-admin',
                 'descripcion' => 'Acceso total al sistema',
             ],
-            self::ROL_DOCENTE    => [
-                'nombre'      => 'Docente',
-                'clase'       => 'rol-docente',
+            self::ROL_PROFESOR   => [
+                'nombre'      => 'Profesor',
+                'clase'       => 'rol-profesor',
                 'descripcion' => 'Gestiona notas y consulta sus cursos asignados',
-            ],
-            self::ROL_ESTUDIANTE => [
-                'nombre'      => 'Estudiante',
-                'clase'       => 'rol-estudiante',
-                'descripcion' => 'Consulta sus notas, matrículas y horarios',
             ],
             self::ROL_SECRETARIA => [
                 'nombre'      => 'Secretaría',
@@ -61,7 +55,7 @@ class Auth
         return [
             self::ROL_ADMIN => ['*'],
 
-            self::ROL_DOCENTE => [
+            self::ROL_PROFESOR => [
                 'dashboard.ver',
                 'estudiantes.ver',
                 'cursos.ver',
@@ -72,10 +66,6 @@ class Auth
                 'reportes.ver',
                 'reportes.exportar',
                 'noticias.ver',
-                'perfil.ver',
-            ],
-
-            self::ROL_ESTUDIANTE => [
                 'perfil.ver',
             ],
 
@@ -130,9 +120,8 @@ class Auth
     public static function url_inicio(): string
     {
         return match (self::rol()) {
-            self::ROL_DOCENTE    => base_url('docente.php'),
-            self::ROL_ESTUDIANTE => base_url('views/estudiantes/mis_calificaciones.php'),
-            default              => base_url('dashboard.php'),
+            self::ROL_PROFESOR => base_url('profesor.php'),
+            default            => base_url('dashboard.php'),
         };
     }
 
@@ -148,10 +137,12 @@ class Auth
         $db = db();
 
         $usuario = $db->fila(
-            "SELECT id_usuario, nombres, apellidos, email, password_hash, id_rol, activo, avatar
-               FROM usuarios
-              WHERE (email = :login OR CONCAT(nombres, ' ', apellidos) = :login2)
-                AND activo = 1
+            "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.password_hash, u.id_rol, u.activo, u.avatar
+               FROM usuarios u
+               INNER JOIN roles r ON r.id_rol = u.id_rol AND r.activo = 1
+              WHERE (u.email = :login OR CONCAT(u.nombres, ' ', u.apellidos) = :login2)
+                AND u.activo = 1
+                AND u.id_rol IS NOT NULL
               LIMIT 1",
             [':login' => $login, ':login2' => $login]
         );
@@ -197,6 +188,15 @@ class Auth
     /** Inicia sesión regenerando el ID (anti session fixation). */
     public static function iniciar(array $usuario): void
     {
+        $idRol = isset($usuario['id_rol']) && $usuario['id_rol'] !== null
+            ? (int) $usuario['id_rol']
+            : 0;
+
+        /* Sin rol de sistema no hay acceso: la cuenta no pertenece a este panel. */
+        if ($idRol <= 0 || !isset(self::roles()[$idRol])) {
+            return;
+        }
+
         self::asegurar_sesion();
         session_regenerate_id(true);
 
@@ -205,10 +205,10 @@ class Auth
             'nombres'    => $usuario['nombres'],
             'apellidos'  => $usuario['apellidos'],
             'email'      => $usuario['email'],
-            'id_rol'     => isset($usuario['id_rol']) ? (int) $usuario['id_rol'] : self::ROL_ADMIN,
+            'id_rol'     => $idRol,
             'avatar'     => $usuario['avatar'] ?? null,
             'nombre'     => $usuario['nombres'] . ' ' . $usuario['apellidos'],
-            'rol'        => self::nombre_rol(isset($usuario['id_rol']) ? (int) $usuario['id_rol'] : self::ROL_ADMIN),
+            'rol'        => self::nombre_rol($idRol),
             'inicio_sesion' => date('Y-m-d H:i:s'),
         ];
 
@@ -283,9 +283,9 @@ class Auth
         return self::rol() === self::ROL_ADMIN;
     }
 
-    public static function es_docente(): bool
+    public static function es_profesor(): bool
     {
-        return self::rol() === self::ROL_DOCENTE;
+        return self::rol() === self::ROL_PROFESOR;
     }
 
     public static function es_secretaria(): bool
@@ -317,13 +317,21 @@ class Auth
         }
 
         $usuario = db()->fila(
-            "SELECT id_usuario, nombres, apellidos, email, id_rol, activo, avatar
-               FROM usuarios
-              WHERE id_usuario = :id",
+            "SELECT u.id_usuario, u.nombres, u.apellidos, u.email,
+                    u.id_rol, u.activo, u.avatar, r.activo AS rol_activo
+               FROM usuarios u
+               LEFT JOIN roles r ON r.id_rol = u.id_rol
+              WHERE u.id_usuario = :id",
             [':id' => self::id()]
         );
-        if (!$usuario || !(int) $usuario['activo']) {
+        if (!$usuario
+            || !(int) $usuario['activo']
+            || $usuario['id_rol'] === null
+            || !(int) $usuario['rol_activo']
+            || !isset(self::roles()[(int) $usuario['id_rol']])
+        ) {
             self::cerrar();
+            flash_set('warning', 'Tu cuenta no tiene acceso a este sistema.');
             redirigir(base_url('login.php'));
         }
 
@@ -364,11 +372,6 @@ class Auth
             require_once APP_ROOT . '/public/403.php';
             exit;
         }
-    }
-
-    public static function es_estudiante(): bool
-    {
-        return self::rol() === self::ROL_ESTUDIANTE;
     }
 
     /* ---------------- Auditoría ---------------- */

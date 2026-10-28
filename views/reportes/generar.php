@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../core/bootstrap.php';
 
 Auth::requerir_permiso('reportes.ver');
 
-$verTodo = !Auth::es_docente();
+$verTodo = !Auth::es_profesor();
 $idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
@@ -303,7 +303,7 @@ require_once APP_ROOT . '/layout/header.php';
             <?php
             $exportables = [
                 'estudiantes' => ['Estudiantes', 'Listado con especialidad y estado', 'M17 21l4.4-4.4M9 11l3 3L22 4'],
-                'profesores'  => ['Docentes', 'Datos de contacto y titulación', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z'],
+                'profesores'  => ['Profesores', 'Datos de contacto y titulación', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z'],
                 'cursos'      => ['Cursos', 'Plan de estudios activo', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2zM9 9h6M9 13h6'],
                 'matriculas'  => ['Matrículas', 'Inscripciones por periodo ' . $periodo, 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'],
                 'notas'       => ['Notas', 'Calificaciones del periodo ' . $periodo, 'M9 19V5l12-2v14l-12 2zM9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z'],

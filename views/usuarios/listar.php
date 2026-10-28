@@ -462,7 +462,7 @@ require_once APP_ROOT . '/layout/header.php';
                             <?php
                             $colorRol = [
                                 'Administrador' => 'blue',
-                                'Docente'       => 'green',
+                                'Profesor'      => 'green',
                                 'Estudiante'    => 'gray',
                                 'Secretaría'    => 'gold',
                                 'Auditoría'     => 'blue',

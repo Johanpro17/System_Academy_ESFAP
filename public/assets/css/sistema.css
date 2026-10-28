@@ -1113,16 +1113,10 @@ table.data th.num {
     border-color: var(--brand-100);
 }
 
-.rol-docente {
+.rol-profesor {
     background: var(--ok-bg);
     color: var(--ok);
     border-color: rgba(15, 157, 88, .25);
-}
-
-.rol-estudiante {
-    background: var(--gold-soft);
-    color: #7d5a14;
-    border-color: rgba(200, 162, 74, .4);
 }
 
 .rol-secretaria {
@@ -4197,7 +4191,7 @@ table.data tbody tr:focus-within {
 /* Modo oscuro: estados y roles con contraste suficiente */
 [data-theme="oscuro"] .badge-green,
 [data-theme="oscuro"] .alert-success,
-[data-theme="oscuro"] .rol-docente {
+[data-theme="oscuro"] .rol-profesor {
     color: #4ade80;
 }
 
@@ -4216,7 +4210,6 @@ table.data tbody tr:focus-within {
 }
 
 [data-theme="oscuro"] .badge-gold,
-[data-theme="oscuro"] .rol-estudiante,
 [data-theme="oscuro"] .rol-secretaria {
     color: #e2be74;
 }

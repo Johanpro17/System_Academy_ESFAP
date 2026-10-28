@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Migración aditiva de roles y cuentas institucionales.
+ * Siembra de roles y cuentas institucionales.
  *
  * Uso: php scripts/sembrar_roles_cuentas.php
  *
- * - Crea/actualiza los roles 4 (Secretaría) y 5 (Auditoría).
+ * - Deja los 4 roles del sistema: Administrador, Profesor, Secretaría y Auditoría.
  * - Crea las cuentas secretaria@esfap.edu y auditoria@esfap.edu si no existen.
- * - No modifica usuarios, estudiantes, profesores ni matrículas existentes.
+ * - Desactiva las cuentas históricas de alumno sin borrar sus datos.
  * - Puede ejecutarse varias veces sin duplicar datos.
  */
 
@@ -19,8 +19,10 @@ if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
 require_once dirname(__DIR__) . '/core/bootstrap.php';
 
 $roles = [
-    [4, 'Secretaría', 'Gestiona estudiantes, matrículas y constancias'],
-    [5, 'Auditoría',  'Consulta toda la información y la bitácora del sistema'],
+    [1, 'Administrador', 'Acceso total al sistema'],
+    [2, 'Profesor',      'Gestiona notas y consulta sus cursos asignados'],
+    [4, 'Secretaría',    'Gestiona estudiantes, matrículas y constancias'],
+    [5, 'Auditoría',     'Consulta toda la información y la bitácora del sistema'],
 ];
 
 $cuentas = [
@@ -43,9 +45,23 @@ $cuentas = [
 try {
     $db = db()->conectar();
 
+    /* Instalaciones antiguas pueden no tener roles.activo. */
+    $tieneActivo = (int) $db->query(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'roles' AND COLUMN_NAME = 'activo'"
+    )->fetchColumn();
+
+    if (!$tieneActivo) {
+        $db->exec('ALTER TABLE roles ADD COLUMN activo TINYINT(1) NOT NULL DEFAULT 1 AFTER descripcion');
+        fwrite(STDOUT, 'Columna roles.activo agregada.' . PHP_EOL);
+    }
+
     $stmtRol = $db->prepare(
-        "INSERT INTO roles (id_rol, nombre, descripcion) VALUES (:id, :nombre, :descripcion)
-         ON DUPLICATE KEY UPDATE nombre = VALUES(nombre), descripcion = VALUES(descripcion)"
+        'INSERT INTO roles (id_rol, nombre, descripcion, activo)
+         VALUES (:id, :nombre, :descripcion, 1)
+         ON DUPLICATE KEY UPDATE nombre = VALUES(nombre),
+                                 descripcion = VALUES(descripcion),
+                                 activo = 1'
     );
 
     foreach ($roles as [$id, $nombre, $descripcion]) {
@@ -55,6 +71,14 @@ try {
             ':descripcion' => $descripcion,
         ]);
     }
+
+    /* El alumno ya no es un usuario del sistema: se conserva la cuenta, no el acceso. */
+    $cuentasAlumno = (int) $db->query('SELECT COUNT(*) FROM usuarios WHERE id_rol = 3')->fetchColumn();
+    if ($cuentasAlumno > 0) {
+        $db->exec('UPDATE usuarios SET activo = 0, id_rol = NULL WHERE id_rol = 3');
+        fwrite(STDOUT, "{$cuentasAlumno} cuenta(s) de alumno desactivadas y sin rol de sistema." . PHP_EOL);
+    }
+    $db->exec('DELETE FROM roles WHERE id_rol = 3');
 
     $totalRoles = (int) $db->query('SELECT COUNT(*) FROM roles')->fetchColumn();
     fwrite(STDOUT, "Roles verificados: {$totalRoles}" . PHP_EOL);
@@ -83,8 +107,8 @@ try {
         fwrite(STDOUT, "Cuenta creada: {$cuenta['email']} · contraseña: {$cuenta['password']}" . PHP_EOL);
     }
 
-    fwrite(STDOUT, 'Migración completada.' . PHP_EOL);
+    fwrite(STDOUT, 'Siembra completada.' . PHP_EOL);
 } catch (Throwable $e) {
-    fwrite(STDERR, 'No se pudo completar la migración: ' . $e->getMessage() . PHP_EOL);
+    fwrite(STDERR, 'No se pudo completar la siembra: ' . $e->getMessage() . PHP_EOL);
     exit(1);
 }

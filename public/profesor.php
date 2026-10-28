@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Panel del docente: información limitada a sus cursos asignados.
+ * Panel del profesor: información limitada a sus cursos asignados.
  */
 
 require_once __DIR__ . '/../core/bootstrap.php';
@@ -45,14 +45,14 @@ $totalEvaluaciones = array_sum(array_map(
     $cursos
 ));
 
-$titulo = 'Panel docente';
+$titulo = 'Panel del profesor';
 $subtitulo = 'Resumen de tus cursos y grupos asignados';
 $seccion = 'dashboard';
 
 require_once APP_ROOT . '/layout/header.php';
 ?>
 
-<section class="stats-grid" aria-label="Resumen de actividad docente">
+<section class="stats-grid" aria-label="Resumen de actividad del profesor">
     <article class="stat-card">
         <span class="stat-label">Cursos asignados</span>
         <strong class="stat-value"><?= count($cursos) ?></strong>
@@ -81,7 +81,7 @@ require_once APP_ROOT . '/layout/header.php';
     <?php if (!$cursos): ?>
         <div class="empty-state">
             <h3>No tienes cursos asignados</h3>
-            <p>Solicita al administrador que vincule tus cursos a tu cuenta docente.</p>
+            <p>Solicita al administrador que vincule tus cursos a tu cuenta de profesor.</p>
         </div>
     <?php else: ?>
         <div class="table-wrap">

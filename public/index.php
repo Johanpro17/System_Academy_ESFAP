@@ -7,7 +7,7 @@ if (isset($_SESSION['user'])) {
     exit;
 }
 
-$imagenes = "../imagenes/";
+$imagenes = "assets/img/";
 
 $modulos = [
     [
@@ -18,7 +18,7 @@ $modulos = [
     ],
     [
         'icono' => 'M12 3l9 5-9 5-9-5 9-5zm0 10v8m9-8v6c0 1.7-4 3-9 3s-9-1.3-9-3v-6',
-        'titulo' => 'Gestión de docentes',
+        'titulo' => 'Gestión de profesores',
         'texto' => 'Organiza horarios, asignaciones y datos de profesores desde una interfaz ordenada y accesible.',
         'meta' => 'Carga académica',
     ],
@@ -38,7 +38,7 @@ $modulos = [
 
 $pasos = [
     ['01', 'Inicia sesión', 'Accede con las credenciales institucionales asignadas por coordinación.'],
-    ['02', 'Registra y organiza', 'Carga cursos, matricula estudiantes y asigna docentes en minutos.'],
+    ['02', 'Registra y organiza', 'Carga cursos, matricula estudiantes y asigna profesores en minutos.'],
     ['03', 'Consulta resultados', 'Revisa promedios, horarios y reportes consolidados del periodo.'],
 ];
 
@@ -55,7 +55,7 @@ $indicadores = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Plataforma institucional para la gestión académica: matrículas, cursos, docentes, horarios y reportes en un solo lugar.">
+        content="Plataforma institucional para la gestión académica: matrículas, cursos, profesores, horarios y reportes en un solo lugar.">
     <title>Portada - Sistema Académico</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,7 +97,7 @@ $indicadores = [
                     <span class="eyebrow">Plataforma institucional</span>
                     <h1>Gestión académica <em>moderna</em> para tu institución</h1>
                     <p class="lead">
-                        Accede a un sistema intuitivo para estudiantes, docentes, secretaría, auditoría y administración.
+                        Accede a un sistema intuitivo para estudiantes, profesores, secretaría, auditoría y administración.
                         Controla matrículas, cursos, reportes y horarios en una sola experiencia profesional.
                     </p>
 

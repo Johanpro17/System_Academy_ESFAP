@@ -4,8 +4,8 @@
  * Copia de seguridad de la base de datos.
  *
  * Uso (línea de comandos):
- *   php scripts/backup_bd.php                → crear respaldo
- *   php scripts/backup_bd.php --conservar=20 → conservar las últimas N copias
+ *   php scripts/respaldo_bd.php                → crear respaldo
+ *   php scripts/respaldo_bd.php --conservar=20 → conservar las últimas N copias
  *
  * Genera un archivo .sql íntegro (estructura + datos) en backups/.
  * No requiere mysqldump: exporta con PDO sobre la propia conexión.
@@ -72,7 +72,7 @@ $salto = fn() => fwrite($salida, PHP_EOL);
 
 fwrite($salida, "-- Sistema Académico — respaldo de base de datos" . PHP_EOL);
 fwrite($salida, "-- Base: " . $cfg['db_name'] . "  Fecha: " . date('Y-m-d H:i:s') . PHP_EOL);
-fwrite($salida, "-- Generado por scripts/backup_bd.php" . PHP_EOL);
+fwrite($salida, "-- Generado por scripts/respaldo_bd.php" . PHP_EOL);
 $salto();
 fwrite($salida, "SET NAMES utf8mb4;" . PHP_EOL);
 fwrite($salida, "SET FOREIGN_KEY_CHECKS=0;" . PHP_EOL);

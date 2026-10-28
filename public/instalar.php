@@ -122,30 +122,36 @@ ejecutar(
     "CREATE TABLE IF NOT EXISTS roles (
         id_rol TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         nombre VARCHAR(50) NOT NULL UNIQUE,
-        descripcion VARCHAR(150) DEFAULT NULL
+        descripcion VARCHAR(150) DEFAULT NULL,
+        activo TINYINT(1) NOT NULL DEFAULT 1
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     $mensajes,
     $errores
 );
 
+agregar_columna('roles', 'activo', 'TINYINT(1) NOT NULL DEFAULT 1', $mensajes, $errores);
+
 $roles = [
     [1, 'Administrador', 'Acceso total al sistema'],
-    [2, 'Docente',        'Gestiona notas y consulta sus cursos asignados'],
-    [3, 'Estudiante',     'Consulta sus notas, matrículas y horarios'],
-    [4, 'Secretaría',     'Gestiona estudiantes, matrículas y constancias'],
-    [5, 'Auditoría',      'Consulta toda la información y la bitácora del sistema'],
+    [2, 'Profesor',      'Gestiona notas y consulta sus cursos asignados'],
+    [4, 'Secretaría',    'Gestiona estudiantes, matrículas y constancias'],
+    [5, 'Auditoría',     'Consulta toda la información y la bitácora del sistema'],
 ];
 
 foreach ($roles as $r) {
     try {
-        $db->prepare("INSERT INTO roles (id_rol, nombre, descripcion) VALUES (?,?,?)
-                      ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion)")
+        $db->prepare("INSERT INTO roles (id_rol, nombre, descripcion, activo) VALUES (?,?,?,1)
+                      ON DUPLICATE KEY UPDATE nombre = VALUES(nombre), descripcion = VALUES(descripcion), activo = 1")
             ->execute($r);
     } catch (PDOException $e) {
         $errores[] = "Rol {$r[1]}: " . $e->getMessage();
     }
 }
-$mensajes[] = ['msg' => 'Roles verificados (5 roles).', 'type' => 'success'];
+
+/* El rol Estudiante pertenece al panel de alumnos, no a este sistema.
+   Se retira después de crear la tabla usuarios (ver sección 2). */
+
+$mensajes[] = ['msg' => 'Roles verificados (4 roles de sistema).', 'type' => 'success'];
 
 /* ==================================================================
  * 2. Tabla usuarios (+ roles, avatar, teléfono, acceso)
@@ -158,7 +164,7 @@ ejecutar(
         apellidos VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
-        id_rol TINYINT UNSIGNED DEFAULT 1,
+        id_rol TINYINT UNSIGNED DEFAULT NULL,
         telefono VARCHAR(30) DEFAULT NULL,
         avatar VARCHAR(255) DEFAULT NULL,
         activo TINYINT(1) NOT NULL DEFAULT 1,
@@ -170,12 +176,21 @@ ejecutar(
     $errores
 );
 
-agregar_columna('usuarios', 'id_rol',      "TINYINT UNSIGNED DEFAULT 1", $mensajes, $errores);
+agregar_columna('usuarios', 'id_rol',      "TINYINT UNSIGNED DEFAULT NULL", $mensajes, $errores);
 agregar_columna('usuarios', 'telefono',    "VARCHAR(30) DEFAULT NULL", $mensajes, $errores);
 agregar_columna('usuarios', 'avatar',      "VARCHAR(255) DEFAULT NULL", $mensajes, $errores);
 agregar_columna('usuarios', 'ultimo_acceso', "DATETIME DEFAULT NULL", $mensajes, $errores);
 agregar_columna('usuarios', 'creado_en',   "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP", $mensajes, $errores);
 agregar_indice('usuarios', 'idx_usuarios_rol', "INDEX idx_usuarios_rol (id_rol)", $mensajes, $errores);
+agregar_indice('usuarios', 'idx_usuarios_rol_activo', "INDEX idx_usuarios_rol_activo (id_rol, activo)", $mensajes, $errores);
+
+/* Las cuentas históricas de alumno quedan fuera del sistema, sin borrar datos. */
+try {
+    $db->exec('UPDATE usuarios SET activo = 0, id_rol = NULL WHERE id_rol = 3');
+    $db->exec('DELETE FROM roles WHERE id_rol = 3');
+} catch (PDOException $e) {
+    $errores[] = 'Retiro del rol Estudiante: ' . $e->getMessage();
+}
 
 /* ==================================================================
  * 3. Tabla especialidades
@@ -271,7 +286,9 @@ ejecutar(
         telefono VARCHAR(30) DEFAULT NULL,
         titulo VARCHAR(120) DEFAULT NULL,
         activo TINYINT(1) NOT NULL DEFAULT 1,
-        creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uk_prof_usuario (id_usuario),
+        CONSTRAINT fk_prof_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     $mensajes,
     $errores
@@ -282,6 +299,7 @@ foreach (['telefono', 'titulo', 'activo', 'creado_en', 'id_usuario'] as $c) {
         : ($c === 'creado_en' ? 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP' : ($c === 'id_usuario' ? 'INT DEFAULT NULL' : 'VARCHAR(100) DEFAULT NULL')), $mensajes, $errores);
 }
 agregar_indice('profesores', 'idx_prof_usuario', "INDEX idx_prof_usuario (id_usuario)", $mensajes, $errores);
+agregar_indice('profesores', 'uk_prof_usuario', "UNIQUE KEY uk_prof_usuario (id_usuario)", $mensajes, $errores);
 
 /* ==================================================================
  * 6. Tabla estudiantes
@@ -290,25 +308,54 @@ ejecutar(
     'Tabla `estudiantes`',
     "CREATE TABLE IF NOT EXISTS estudiantes (
         id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
-        id_usuario INT NOT NULL,
+        id_usuario INT DEFAULT NULL,
+        nombres VARCHAR(100) DEFAULT NULL,
+        apellidos VARCHAR(100) DEFAULT NULL,
+        email VARCHAR(150) DEFAULT NULL,
+        telefono VARCHAR(30) DEFAULT NULL,
         id_especialidad INT NOT NULL,
         dni VARCHAR(20) DEFAULT NULL,
         matricula VARCHAR(30) DEFAULT NULL,
         anio_ingreso YEAR DEFAULT NULL,
         estado ENUM('activo','egresado','retirado') DEFAULT 'activo',
         creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uk_est_dni (dni),
+        UNIQUE KEY uk_est_matricula (matricula),
         INDEX idx_est_usuario (id_usuario),
         INDEX idx_est_esp (id_especialidad),
-        CONSTRAINT fk_est_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+        INDEX idx_est_nombre (apellidos, nombres),
+        INDEX idx_est_estado (estado),
+        INDEX idx_est_esp_estado (id_especialidad, estado),
+        INDEX idx_est_email (email),
+        CONSTRAINT fk_est_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
         CONSTRAINT fk_est_esp FOREIGN KEY (id_especialidad) REFERENCES especialidades(id_especialidad)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     $mensajes,
     $errores
 );
 
-foreach (['dni' => 'VARCHAR(20) DEFAULT NULL', 'matricula' => 'VARCHAR(30) DEFAULT NULL', 'anio_ingreso' => 'YEAR DEFAULT NULL', 'estado' => "ENUM('activo','egresado','retirado') DEFAULT 'activo'"] as $c => $d) {
+foreach ([
+    'nombres'        => 'VARCHAR(100) DEFAULT NULL',
+    'apellidos'      => 'VARCHAR(100) DEFAULT NULL',
+    'email'          => 'VARCHAR(150) DEFAULT NULL',
+    'telefono'       => 'VARCHAR(30) DEFAULT NULL',
+    'dni'            => 'VARCHAR(20) DEFAULT NULL',
+    'matricula'      => 'VARCHAR(30) DEFAULT NULL',
+    'anio_ingreso'   => 'YEAR DEFAULT NULL',
+    'estado'         => "ENUM('activo','egresado','retirado') DEFAULT 'activo'",
+    'creado_en'      => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
+    'actualizado_en' => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+] as $c => $d) {
     agregar_columna('estudiantes', $c, $d, $mensajes, $errores);
 }
+
+agregar_indice('estudiantes', 'uk_est_dni', 'UNIQUE KEY uk_est_dni (dni)', $mensajes, $errores);
+agregar_indice('estudiantes', 'uk_est_matricula', 'UNIQUE KEY uk_est_matricula (matricula)', $mensajes, $errores);
+agregar_indice('estudiantes', 'idx_est_nombre', 'INDEX idx_est_nombre (apellidos, nombres)', $mensajes, $errores);
+agregar_indice('estudiantes', 'idx_est_estado', 'INDEX idx_est_estado (estado)', $mensajes, $errores);
+agregar_indice('estudiantes', 'idx_est_esp_estado', 'INDEX idx_est_esp_estado (id_especialidad, estado)', $mensajes, $errores);
+agregar_indice('estudiantes', 'idx_est_email', 'INDEX idx_est_email (email)', $mensajes, $errores);
 
 /* ==================================================================
  * 7. Tabla matriculas
@@ -580,7 +627,8 @@ try {
         CREATE OR REPLACE VIEW v_promedio_por_curso AS
         SELECT
             e.id_estudiante,
-            CONCAT(u.nombres, ' ', u.apellidos) AS estudiante,
+            CONCAT_WS(' ', e.nombres, e.apellidos) AS estudiante,
+            e.matricula AS matricula,
             c.id_curso,
             c.nombre AS curso,
             n.periodo,
@@ -590,9 +638,8 @@ try {
             SUM(CASE WHEN n.valor <  7 THEN 1 ELSE 0 END) AS reprobadas
         FROM notas n
         INNER JOIN estudiantes e ON e.id_estudiante = n.id_estudiante
-        INNER JOIN usuarios u      ON u.id_usuario  = e.id_usuario
-        INNER JOIN cursos c        ON c.id_curso     = n.id_curso
-        GROUP BY e.id_estudiante, u.nombres, u.apellidos, c.id_curso, c.nombre, n.periodo
+        INNER JOIN cursos c        ON c.id_curso      = n.id_curso
+        GROUP BY e.id_estudiante, e.nombres, e.apellidos, e.matricula, c.id_curso, c.nombre, n.periodo
     ");
     $mensajes[] = ['msg' => 'Vista `v_promedio_por_curso` creada.', 'type' => 'success'];
 } catch (PDOException $e) {

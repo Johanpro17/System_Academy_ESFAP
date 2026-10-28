@@ -169,7 +169,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
                 </span>
 
                 <h2>Gestión académica en un solo lugar</h2>
-                <p>Matrículas, cursos, docentes, horarios y reportes conectados para toda la institución.</p>
+                <p>Matrículas, cursos, profesores, horarios y reportes conectados para toda la institución.</p>
 
                 <ul>
                     <li>
@@ -201,7 +201,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
 
             <main class="auth-main">
                 <div class="auth-logo">
-                    <img src="<?= e(base_url('../imagenes/logoInstitucion.jpg')) ?>" alt="Logo de la institución">
+                    <img src="<?= e(base_url('assets/img/logoInstitucion.jpg')) ?>" alt="Logo de la institución">
                 </div>
 
                 <h1>Iniciar sesión</h1>

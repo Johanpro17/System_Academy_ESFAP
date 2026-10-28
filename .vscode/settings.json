@@ -1,0 +1,34 @@
+{
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.associations": {
+        "*.php": "php"
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [
+        120
+    ],
+    "php.validate.enable": true,
+    "php.validate.executablePath": "C:\\xampp\\php\\php.exe",
+    "intelephense.environment.phpVersion": "8.1.0",
+    "emmet.includeLanguages": {
+        "php": "html"
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "logs": true,
+        "backups": true
+    },
+    "search.exclude": {
+        "logs": true,
+        "backups": true,
+        "vendor": true
+    },
+    "files.watcherExclude": {
+        "**/logs/**": true,
+        "**/backups/**": true
+    }
+}

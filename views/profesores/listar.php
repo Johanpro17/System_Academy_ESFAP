@@ -54,7 +54,7 @@ $registros = Paginador::obtener('profesores', $columnas, $filtros, $orden, $porP
 $paramsFiltros = array_filter(['q' => $q]);
 
 $titulo    = 'Profesores';
-$subtitulo = $total . ' ' . ($total === 1 ? 'docente' : 'docentes') . ' en la plantilla';
+$subtitulo = $total . ' ' . ($total === 1 ? 'profesor' : 'profesores') . ' en la plantilla';
 $seccion   = 'profesores';
 $ancho     = 'content-narrow';
 
@@ -72,7 +72,7 @@ require_once APP_ROOT . '/layout/header.php';
 <div class="panel">
     <div class="panel-head">
         <div>
-            <h2>Plantilla docente</h2>
+            <h2>Plantilla de profesores</h2>
             <p>Especialidades, contacto y estado de los profesores</p>
         </div>
         <div class="panel-actions no-print">
@@ -110,11 +110,11 @@ require_once APP_ROOT . '/layout/header.php';
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m9-6v5c0 1.7-4 3-9 3s-9-1.3-9-3v-5" />
                 </svg>
-                <h3><?= $paramsFiltros ? 'Sin resultados' : 'Sin docentes registrados' ?></h3>
+                <h3><?= $paramsFiltros ? 'Sin resultados' : 'Sin profesores registrados' ?></h3>
                 <p>
                     <?= $paramsFiltros
                         ? 'Ningún profesor coincide con la búsqueda.'
-                        : 'Registra al primer docente para poder asignarle cursos y horarios.' ?>
+                        : 'Registra al primer profesor para poder asignarle cursos y horarios.' ?>
                 </p>
                 <?php if ($paramsFiltros): ?>
                     <a class="btn btn-outline" href="listar.php">Limpiar búsqueda</a>

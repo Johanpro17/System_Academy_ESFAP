@@ -2,7 +2,7 @@
 
 /**
  * Constancia de matrícula imprimible con folio.
- * Accesible para administración, secretaría y docentes.
+ * Accesible para administración, secretaría y profesores.
  */
 
 require_once __DIR__ . '/../../core/bootstrap.php';
@@ -14,20 +14,19 @@ $id = input_int('id');
 $registro = $id ? db()->fila(
     "SELECT m.id_matricula, m.periodo, m.estado, m.fecha_matricula,
             e.matricula AS codigo, e.dni,
-            CONCAT(u.nombres,' ',u.apellidos) AS estudiante, u.email,
+            CONCAT(e.nombres,' ',e.apellidos) AS estudiante, e.email,
             esp.nombre AS especialidad,
             c.nombre AS curso, c.codigo AS codigo_curso, c.creditos, c.area,
             p.nombres AS docente
        FROM matriculas m
        JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
-       JOIN usuarios u ON u.id_usuario = e.id_usuario
        JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad
        JOIN cursos c ON c.id_curso = m.id_curso
        LEFT JOIN horarios h ON h.id_curso = c.id_curso
             AND h.periodo = m.periodo
        LEFT JOIN profesores p ON p.id_profesor = h.id_profesor
       WHERE m.id_matricula = :id"
-        . (Auth::es_docente() ? "
+        . (Auth::es_profesor() ? "
             AND EXISTS (
                 SELECT 1 FROM curso_docentes cd
                  WHERE cd.id_curso = m.id_curso

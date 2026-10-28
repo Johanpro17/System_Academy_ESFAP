@@ -1,35 +1,41 @@
-# Estado de mejoras profesionales (2026-10-09)
+# Estado del sistema
 
-## Aplicado
-- `core/Errores.php`: manejador global (errors/exceptions/fatals) → logs/app.log, páginas amigables 500
-- `core/bootstrap.php`: inicializa Errores, añade `APP_DEBUG`, `Permissions-Policy`
-- `config/config.php`: `debug` (env `APP_DEBUG`)
-- `.htaccess` raíz + internos (config/core/legado/scripts/logs/backups) + bloqueo .(sql|log|ini|bak|old|env|dist|lock)
-- `scripts/backup_bd.php` + `scripts/backup_bd.bat` (dump PDO, vista-aware, retención)
-- `public/403.php`, `public/404.php` pulidas; `public/health.php` (db up/down)
-- Pulido CSS: `public/assets/css/sistema.css`, `public/portada.css` (visual coherente, modo oscuro)
-- Favicon SVG existente, usa base_url
-- Árbol limpio: `controllers/`, `models/` vacíos eliminados; `dashboard.css`, `login-intranet.css`, `escuela_artistica (1).sql` movidos a `legado/`; `TODO.md` → `docs/`
+## Refactor de modelo académico y base de datos (2026-10-28)
 
-## Verificación
-- .htaccess: 403 para `/legado/*.sql`, `/config/database.php`, `/scripts/backup_bd.php`, listado `/legado/` → OK
-- Smoke: login/index/css/js 200; 403/404 200 con texto → OK
-- Tests: pruebas.php 65/0, test_password.php 34/0, test_matricula.php 71/0, test_instalador.php 8/0, test_expansion.php OK
-- Health: `db=up`, HTTP 200 (o 503 si cae)
+### Roles
 
-## Portales de estudiantes y docentes
-- Estudiantes inician en su portal personal de calificaciones, con consultas limitadas a su propia ficha.
-- La ficha de profesor crea o vincula una cuenta con rol Docente y contraseña; desde cada curso se administran las asignaciones docentes. El panel, listados, reportes, exportaciones y constancias del docente se limitan a sus cursos asignados; solo administración conserva la vista institucional completa. Los horarios se filtran por docente y siguen mostrando las sesiones programadas.
-- La publicación de noticias y el envío de avisos a toda la comunidad quedan reservados a administración.
-- En instalaciones existentes, ejecutar `php scripts/migrar_curso_docentes.php` para crear la relación de asignaciones y copiar las que ya aparecen en horarios.
-- Para habilitar cuentas de profesores existentes, abrir y guardar su ficha desde Administración → Profesores, asignando correo y contraseña.
+- Cuatro roles de sistema: `1 Administrador`, `2 Profesor`, `4 Secretaría`, `5 Auditoría`.
+- El rol `3 Estudiante` se retiró: el alumno ya no inicia sesión en este panel.
+- `roles.activo` permite desactivar un rol sin borrar su historial.
+- El login exige `usuarios.activo = 1`, `id_rol` no nulo y un rol activo. `Auth::iniciar()` no asigna Administrador por defecto.
 
-## Roles de secretaría y auditoría, permisos por acción y paleta morada (2026-10-28)
-- Roles nuevos: `4 Secretaría` y `5 Auditoría`, con cuentas `secretaria@esfap.edu` / `Secretaria2026` y `auditoria@esfap.edu` / `Auditoria2026` (cambiar antes de publicar).
-- `core/Auth.php`: constantes de rol, matriz de permisos por acción, helpers de rol y `requerir_permiso()`; el administrador conserva `*`.
-- Secretaría gestiona estudiantes, matrículas y constancias, y consulta el resto (incluida la lista de usuarios); notas en solo lectura.
-- Auditoría consulta todo y la bitácora, sin escrituras. Docente sigue limitado a sus cursos; el resto de roles ve datos globales.
-- Cada acción POST valida su permiso además de ocultar la interfaz; los menús y paneles se generan según permisos.
-- Instalador actualizado y `scripts/sembrar_roles_cuentas.php` (idempotente) para instalaciones existentes.
-- Paleta institucional migrada de azul a morado (`#6d28d9` claro / `#a78bfa` oscuro) conservando el dorado como acento; neutros y sidebar teñidos, modo oscuro revisado.
-- Verificación: sintaxis PHP en 30 archivos, smoke de 5 roles en 19 páginas sin 500 ni avisos, 403 solo en accesos no permitidos, y POST de escritura bloqueados para secretaría/auditoría.
+### Ficha de alumno independiente
+
+- `estudiantes` incorpora `nombres`, `apellidos`, `email`, `telefono`, `creado_en` y `actualizado_en`.
+- `estudiantes.id_usuario` es opcional y su clave foránea usa `ON DELETE SET NULL`: eliminar una cuenta no elimina la ficha.
+- Las 120 cuentas históricas de alumno siguen en `usuarios`, con `activo = 0` e `id_rol = NULL`; conservan su vínculo en `estudiantes.id_usuario`.
+- El alta y la edición de estudiantes trabajan solo sobre la ficha. No crean cuentas ni contraseñas.
+- Matrículas, constancias, notas, reportes, promedios y panel usan los datos de la ficha, no de `usuarios`.
+
+### Esquema
+
+- `profesores.id_usuario` es `INT`, único y con clave foránea `ON DELETE SET NULL`.
+- Índices: `uk_est_dni`, `uk_est_matricula`, `idx_est_nombre`, `idx_est_estado`, `idx_est_esp_estado`, `idx_est_email`, `idx_usuarios_rol_activo`, `idx_mat_periodo_estado`, `idx_notas_periodo`, `idx_aud_entidad`.
+- Las 15 tablas base usan `utf8mb4_unicode_ci`.
+- `v_promedio_por_curso` se reconstruyó sobre la ficha y devuelve matrícula y nombre correctos.
+
+### Código
+
+- `Auth`: cuatro roles, permisos sin alumno, `url_inicio()` y guardas de sesión.
+- Navegación y dashboard sin portal de alumno; KPIs y últimas matrículas desde la ficha.
+- `public/docente.php` pasó a `public/profesor.php`.
+- Se retiraron el portal `mis_calificaciones`, el importador del carnet (creaba cuentas con el rol eliminado), las migraciones de una sola vez, los datos de demostración y `legado/`.
+- Las imágenes institucionales viven en `public/assets/img/`.
+- `scripts/respaldo_bd.php` y `respaldo_bd.bat` reemplazan al antiguo `backup_bd.*`.
+
+### Verificación
+
+- Migración idempotente ejecutada dos veces sin duplicar datos ni perder registros.
+- Roles resultantes: 2 administradores, 6 profesores, 1 secretaría y 1 auditoría activos.
+- 120 fichas de alumno, 0 cuentas de alumno activas.
+- La vista de promedios responde con datos de la ficha.
