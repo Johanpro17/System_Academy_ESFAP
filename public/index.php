@@ -97,7 +97,7 @@ $indicadores = [
                     <span class="eyebrow">Plataforma institucional</span>
                     <h1>Gestión académica <em>moderna</em> para tu institución</h1>
                     <p class="lead">
-                        Accede a un sistema intuitivo para estudiantes, profesores y administración.
+                        Accede a un sistema intuitivo para estudiantes, docentes, secretaría y administración.
                         Controla matrículas, cursos, reportes y horarios en una sola experiencia profesional.
                     </p>
 
@@ -232,7 +232,7 @@ $indicadores = [
             <div class="shell cta-inner">
                 <div>
                     <h2>¿Listo para organizar tu próximo ciclo?</h2>
-                    <p>Accede con las credenciales institucionales y empieza a manageear matrículas, cursos y reportes.</p>
+                    <p>Accede con las credenciales institucionales y empieza a gestionar matrículas, cursos y reportes.</p>
                 </div>
                 <a href="login.php" class="btn btn-inverse btn-lg">Iniciar Sesión</a>
             </div>
