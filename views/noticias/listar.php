@@ -278,7 +278,7 @@ require_once APP_ROOT . '/layout/header.php';
                             <span class="badge badge-gray">Borrador</span>
                         <?php endif; ?>
                         <?php if ($n['destacado']): ?>
-                            <span class="badge badge-blue no-dot">Destacada</span>
+                            <span class="badge badge-purple no-dot">Destacada</span>
                         <?php endif; ?>
                     </div>
                     <small class="muted nowrap"><?= e(fecha($n['publicado_en'], 'd/m/Y')) ?></small>

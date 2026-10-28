@@ -258,7 +258,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </span>
                 <h3 style="margin:0 0 2px"><?= e($usuario['nombres'] . ' ' . $usuario['apellidos']) ?></h3>
                 <p class="muted small" style="margin:0 0 10px"><?= e($usuario['email']) ?></p>
-                <span class="badge badge-blue no-dot"><?= e(Auth::nombre_rol((int) $usuario['id_rol'])) ?></span>
+                <span class="badge badge-purple no-dot"><?= e(Auth::nombre_rol((int) $usuario['id_rol'])) ?></span>
 
                 <?php if ($miMatricula): ?>
                     <div class="divider"></div>

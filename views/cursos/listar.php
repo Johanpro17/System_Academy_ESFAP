@@ -181,7 +181,7 @@ require_once APP_ROOT . '/layout/header.php';
                                 </td>
                                 <td>
                                     <?php if ($c['area']): ?>
-                                        <span class="badge badge-blue no-dot"><?= e($c['area']) ?></span>
+                                        <span class="badge badge-purple no-dot"><?= e($c['area']) ?></span>
                                     <?php else: ?>
                                         <span class="muted">—</span>
                                     <?php endif; ?>
