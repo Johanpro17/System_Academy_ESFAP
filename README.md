@@ -59,6 +59,7 @@ scripts/    Respaldos y siembra de roles
 docs/       Documentación detallada
 logs/       Registro de errores
 backups/    Respaldos de la base de datos
+Database/   Copia local de la base para revisión (no se sube a Git)
 ```
 
 ## Base de datos

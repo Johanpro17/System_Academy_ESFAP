@@ -15,10 +15,18 @@ El proyecto solo guarda copias de seguridad portables:
 
 ```text
 backups/    archivos .sql generados con scripts/respaldo_bd.php
+Database/   copia portable para revisión (excluida de Git)
 logs/       registro de errores de la aplicación
 ```
 
 No hay archivos de la base sueltos en el proyecto. Esa separación es intencional.
+
+### Copia dentro de `Database/`
+
+`Database/escuela_artistica.sql` es una copia de lectura para revisar el esquema y los
+datos desde VS Code. No es la base viva y no debe importarse sobre `escuela_artistica`
+sin querer reemplazarla. La carpeta se bloquea por HTTP y el `.sql` está excluido de Git
+porque contiene datos personales.
 
 ## Cómo se conecta el sistema
 

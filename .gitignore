@@ -9,6 +9,7 @@
 
 # Volcados de base de datos y residuos del sistema operativo
 /legado/*.sql
+/Database/*.sql
 Thumbs.db
 Desktop.ini
 .DS_Store
