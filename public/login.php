@@ -154,6 +154,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Acceso al sistema académico de la ESFAP: matrículas, cursos, notas, horarios y reportes institucionales.">
     <title>Iniciar sesión · <?= e(APP_NOMBRE) ?></title>
     <link rel="icon" href="<?= e(base_url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
     <link rel="stylesheet" href="<?= e(base_url('assets/css/sistema.css')) ?>">
@@ -198,7 +199,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
                 </ul>
             </aside>
 
-            <div class="auth-main">
+            <main class="auth-main">
                 <div class="auth-logo">
                     <img src="<?= e(base_url('../imagenes/logoInstitucion.jpg')) ?>" alt="Logo de la institución">
                 </div>
@@ -274,7 +275,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
                 <div class="auth-foot">
                     ¿Necesitas ayuda? <a href="<?= e(base_url('index.php')) ?>">Volver a la portada</a>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 

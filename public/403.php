@@ -14,6 +14,8 @@ if (defined('APP_NOMBRE')) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Acceso denegado: no tienes permisos para visualizar este recurso del sistema académico ESFAP.">
     <title>403 · Acceso denegado · <?= e(APP_NOMBRE) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,11 +35,11 @@ if (defined('APP_NOMBRE')) {
     </style>
 </head>
 <body>
-<div class="card">
+<main class="card">
     <div class="mark">403</div>
     <h1>Acceso denegado</h1>
     <p><?= e($mensaje) ?></p>
     <a class="btn" href="<?= e($url) ?>"><?= e($texto) ?></a>
-</div>
+</main>
 </body>
 </html>

@@ -6,6 +6,8 @@ require_once __DIR__ . '/../core/bootstrap.php';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Página no encontrada en el sistema académico ESFAP. Verifica la dirección o vuelve a la portada.">
     <title>404 · Página no encontrada · <?= e(APP_NOMBRE) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,12 +28,12 @@ require_once __DIR__ . '/../core/bootstrap.php';
     </style>
 </head>
 <body>
-<div class="card">
+<main class="card">
     <div class="mark">404</div>
     <h1>Página no encontrada</h1>
     <p>El enlace puede haber sido modificado, eliminado o la dirección es incorrecta.</p>
     <a class="btn" href="<?= e(base_url('public/index.php')) ?>">Volver a la portada</a>
     <small>Si crees que esto es un error, informa al administrador.</small>
-</div>
+</main>
 </body>
 </html>
