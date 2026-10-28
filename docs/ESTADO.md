@@ -23,3 +23,13 @@
 - La publicación de noticias y el envío de avisos a toda la comunidad quedan reservados a administración.
 - En instalaciones existentes, ejecutar `php scripts/migrar_curso_docentes.php` para crear la relación de asignaciones y copiar las que ya aparecen en horarios.
 - Para habilitar cuentas de profesores existentes, abrir y guardar su ficha desde Administración → Profesores, asignando correo y contraseña.
+
+## Roles de secretaría y auditoría, permisos por acción y paleta morada (2026-10-28)
+- Roles nuevos: `4 Secretaría` y `5 Auditoría`, con cuentas `secretaria@esfap.edu` / `Secretaria2026` y `auditoria@esfap.edu` / `Auditoria2026` (cambiar antes de publicar).
+- `core/Auth.php`: constantes de rol, matriz de permisos por acción, helpers de rol y `requerir_permiso()`; el administrador conserva `*`.
+- Secretaría gestiona estudiantes, matrículas y constancias, y consulta el resto (incluida la lista de usuarios); notas en solo lectura.
+- Auditoría consulta todo y la bitácora, sin escrituras. Docente sigue limitado a sus cursos; el resto de roles ve datos globales.
+- Cada acción POST valida su permiso además de ocultar la interfaz; los menús y paneles se generan según permisos.
+- Instalador actualizado y `scripts/sembrar_roles_cuentas.php` (idempotente) para instalaciones existentes.
+- Paleta institucional migrada de azul a morado (`#6d28d9` claro / `#a78bfa` oscuro) conservando el dorado como acento; neutros y sidebar teñidos, modo oscuro revisado.
+- Verificación: sintaxis PHP en 30 archivos, smoke de 5 roles en 19 páginas sin 500 ni avisos, 403 solo en accesos no permitidos, y POST de escritura bloqueados para secretaría/auditoría.

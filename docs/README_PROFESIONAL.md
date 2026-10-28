@@ -29,6 +29,7 @@ Sistema académico desarrollado para la Escuela de Formación Artística ESFAP. 
 - Manejador centralizado de errores (sin exposición de rutas/SQL)
 - Portal de estudiantes limitado a la consulta de sus propias calificaciones
 - Las cuentas docentes se crean o vinculan desde la ficha de profesor; panel, listados, reportes, exportaciones, constancias y registro de notas se limitan a cursos asignados
+- Permisos por acción (`Auth::puede()` / `Auth::requerir_permiso()`) con cinco roles: Administrador, Docente, Estudiante, Secretaría y Auditoría; cada acción de escritura valida su permiso también en el POST
 
 ## Instalación rápida
 1. Clonar/colocar en `C:\xampp\htdocs\Johan\sistema-academico\`
@@ -37,11 +38,15 @@ Sistema académico desarrollado para la Escuela de Formación Artística ESFAP. 
 4. Al finalizar queda bloqueado (`config/.instalado`)
 5. Login inicial: `admin@sistema.edu` / `admin123`. Cambia la contraseña antes de poner el sistema a disposición de usuarios.
 6. Desde **Profesores**, crea cada perfil con su correo y contraseña de acceso. Desde **Estudiantes**, crea una cuenta estudiante con correo y contraseña; comparte las credenciales de forma privada.
+7. El instalador crea además las cuentas `secretaria@esfap.edu` / `Secretaria2026` y `auditoria@esfap.edu` / `Auditoria2026`. Cámbialas antes de publicar el sistema.
+8. En instalaciones existentes sin esos roles, ejecuta una vez `C:\xampp\php\php.exe scripts\sembrar_roles_cuentas.php` (idempotente; no altera datos académicos).
 
 ## Portales por rol
 - **Estudiante:** al iniciar sesión llega a `Mis calificaciones`. Solo puede consultar sus notas y promedios; el acceso a módulos de gestión queda denegado.
 - **Docente:** usa el panel docente. Un administrador asigna los cursos desde el formulario del curso; el docente solo puede consultar estudiantes y matrículas inscritos en esos cursos, acceder a sus reportes y constancias, y registrar notas dentro de ellos. La ficha de profesor debe estar vinculada a una cuenta con rol Docente. Los horarios muestran las sesiones efectivamente programadas. Solo administración puede publicar noticias para toda la comunidad.
-- **Administrador:** gestiona usuarios, fichas, matrículas, cursos, horarios y el resto del sistema.
+- **Secretaría:** gestiona estudiantes, matrículas y constancias, y consulta cursos, notas (solo lectura), horarios, reportes, noticias y usuarios. No puede crear ni editar usuarios, profesores, cursos ni noticias.
+- **Auditoría:** consulta toda la información y la bitácora del sistema en modo lectura; no puede modificar datos.
+- **Administrador:** gestiona usuarios, fichas, matrículas, cursos, horarios, noticias y el resto del sistema; único rol con permisos de gestión de usuarios, profesores, cursos y noticias.
 
 ### Activar asignaciones de docentes en una instalación existente
 Ejecuta una vez desde la carpeta del proyecto: `C:\xampp\php\php.exe scripts\migrar_curso_docentes.php`. La migración crea la relación curso-docente y conserva las asignaciones que ya existan en horarios; después, asigna docentes desde el formulario de cada curso.
@@ -68,4 +73,4 @@ Nota: las pruebas de flujo autenticado NO deben ejecutarse en paralelo (bloqueo 
 ## Notas
 - Zona horaria `America/Bogota` (UTC-5). Conservada la lógica existente.
 - Modo oscuro disponible desde topbar.
-- Diseño institucional (azul/índigo + dorado) con pulido visual.
+- Diseño institucional (morado + dorado) con pulido visual, modo claro/oscuro y componentes adaptables.
