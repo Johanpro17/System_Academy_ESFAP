@@ -6,14 +6,16 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('usuarios.ver');
 
+$puedeGestionar = Auth::puede('usuarios.gestionar');
 $errores = [];
 $roles   = db()->todas("SELECT id_rol, nombre, descripcion FROM roles ORDER BY id_rol");
 $miId    = (int) Auth::id();
 
 if (es_post()) {
     exigir_post();
+    Auth::requerir_permiso('usuarios.gestionar');
     $accion = input('accion');
 
     /* Crear usuario */
@@ -228,7 +230,7 @@ $usuarios = Paginador::obtener(
 
 /* Usuario en edición */
 $editando = null;
-if (input_int('editar')) {
+if ($puedeGestionar && input_int('editar')) {
     $editando = db()->fila("SELECT * FROM usuarios WHERE id_usuario = :id", [':id' => input_int('editar')]);
 }
 
@@ -257,7 +259,8 @@ require_once APP_ROOT . '/layout/header.php';
     </div>
 <?php endif; ?>
 
-<div class="grid-2">
+<div class="<?= $puedeGestionar ? 'grid-2' : '' ?>">
+    <?php if ($puedeGestionar): ?>
     <div class="panel">
         <div class="panel-head">
             <div>
@@ -397,6 +400,7 @@ require_once APP_ROOT . '/layout/header.php';
             </form>
         </div>
     </div>
+    <?php endif; ?>
 
     <div class="panel">
         <div class="panel-head">
@@ -449,12 +453,20 @@ require_once APP_ROOT . '/layout/header.php';
                                 <th>Rol</th>
                                 <th>Estado</th>
                                 <th>Último acceso</th>
-                                <th class="num">Acciones</th>
+                                <?php if ($puedeGestionar): ?>
+                                    <th class="num">Acciones</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            $colorRol = ['Administrador' => 'blue', 'Docente' => 'green', 'Estudiante' => 'gray'];
+                            $colorRol = [
+                                'Administrador' => 'blue',
+                                'Docente'       => 'green',
+                                'Estudiante'    => 'gray',
+                                'Secretaría'    => 'gold',
+                                'Auditoría'     => 'blue',
+                            ];
                             ?>
                             <?php foreach ($usuarios as $u): ?>
                                 <tr>
@@ -482,6 +494,7 @@ require_once APP_ROOT . '/layout/header.php';
                                     <td class="muted small nowrap">
                                         <?= $u['ultimo_acceso'] ? e(fecha($u['ultimo_acceso'], 'd/m/Y H:i')) : 'Nunca' ?>
                                     </td>
+                                    <?php if ($puedeGestionar): ?>
                                     <td class="num">
                                         <div class="flex gap-sm" style="justify-content:flex-end">
                                             <a class="btn btn-ghost btn-sm" title="Editar"
@@ -513,6 +526,7 @@ require_once APP_ROOT . '/layout/header.php';
                                             </form>
                                         </div>
                                     </td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

@@ -116,7 +116,8 @@ class Paginador
                 if ($tipo === 'in') {
                     $marcas = [];
                     foreach ((array) $dato as $k => $v) {
-                        $p = ":{$columna}_{$k}";
+                        /* El marcador no puede contener puntos (v.id_curso). */
+                        $p = ":f{$i}_{$k}";
                         $marcas[] = $p;
                         $params[$p] = $v;
                     }

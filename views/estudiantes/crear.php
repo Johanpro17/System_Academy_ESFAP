@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('estudiantes.crear');
 
 $especialidades = db()->todas("SELECT id_especialidad, nombre FROM especialidades ORDER BY nombre ASC");
 

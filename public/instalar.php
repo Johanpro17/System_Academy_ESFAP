@@ -130,8 +130,10 @@ ejecutar(
 
 $roles = [
     [1, 'Administrador', 'Acceso total al sistema'],
-    [2, 'Docente',        'Gestiona cursos y notas de sus clases'],
+    [2, 'Docente',        'Gestiona notas y consulta sus cursos asignados'],
     [3, 'Estudiante',     'Consulta sus notas, matriculas y horarios'],
+    [4, 'Secretaría',     'Gestiona estudiantes, matrículas y constancias'],
+    [5, 'Auditoría',      'Consulta toda la información y la bitácora del sistema'],
 ];
 
 foreach ($roles as $r) {
@@ -143,7 +145,7 @@ foreach ($roles as $r) {
         $errores[] = "Rol {$r[1]}: " . $e->getMessage();
     }
 }
-$mensajes[] = ['msg' => 'Roles verificados (3 roles).', 'type' => 'success'];
+$mensajes[] = ['msg' => 'Roles verificados (5 roles).', 'type' => 'success'];
 
 /* ==================================================================
  * 2. Tabla usuarios (+ roles, avatar, teléfono, acceso)
@@ -620,6 +622,53 @@ try {
     }
 } catch (PDOException $e) {
     $errores[] = 'Usuario administrador: ' . $e->getMessage();
+}
+
+/* ==================================================================
+ * 15b. Cuentas institucionales de secretaría y auditoría
+ * ================================================================== */
+$cuentasInstitucionales = [
+    [
+        'nombres'   => 'Secretaría',
+        'apellidos' => 'Académica',
+        'email'     => 'secretaria@esfap.edu',
+        'password'  => 'Secretaria2026',
+        'rol'       => 4,
+    ],
+    [
+        'nombres'   => 'Auditoría',
+        'apellidos' => 'Institucional',
+        'email'     => 'auditoria@esfap.edu',
+        'password'  => 'Auditoria2026',
+        'rol'       => 5,
+    ],
+];
+
+foreach ($cuentasInstitucionales as $cuenta) {
+    try {
+        $existe = db()->valor(
+            "SELECT id_usuario FROM usuarios WHERE email = :e",
+            [':e' => $cuenta['email']]
+        );
+
+        if (!$existe) {
+            $db->prepare(
+                "INSERT INTO usuarios (nombres, apellidos, email, password_hash, id_rol, activo)
+                 VALUES (:n, :a, :e, :h, :r, 1)"
+            )->execute([
+                ':n' => $cuenta['nombres'],
+                ':a' => $cuenta['apellidos'],
+                ':e' => $cuenta['email'],
+                ':h' => password_hash($cuenta['password'], PASSWORD_DEFAULT),
+                ':r' => $cuenta['rol'],
+            ]);
+            $mensajes[] = ['msg' => "Cuenta {$cuenta['email']} creada.", 'type' => 'success'];
+        } else {
+            $mensajes[] = ['msg' => "La cuenta {$cuenta['email']} ya existe.", 'type' => 'info'];
+        }
+    } catch (PDOException $e) {
+        $errores[] = "Cuenta {$cuenta['email']}: " . $e->getMessage();
+    }
 }
 
 /* ==================================================================

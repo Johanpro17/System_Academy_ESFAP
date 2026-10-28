@@ -6,13 +6,13 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('matriculas.ver');
 
 if (es_post()) {
     exigir_post();
-    Auth::requerir_admin();
 
     if (input('accion') === 'eliminar') {
+        Auth::requerir_permiso('matriculas.eliminar');
         $id = input_int('id');
         try {
             db()->conectar()->prepare("DELETE FROM matriculas WHERE id_matricula = :id")->execute([':id' => $id]);
@@ -27,6 +27,7 @@ if (es_post()) {
     }
 
     if (input('accion') === 'estado') {
+        Auth::requerir_permiso('matriculas.editar');
         $id    = input_int('id');
         $estado = input('estado');
         if (in_array($estado, ['matriculado', 'aprobado', 'reprobado', 'retirado'], true)) {
@@ -62,7 +63,8 @@ $join = 'JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
          JOIN usuarios u ON u.id_usuario = e.id_usuario
          JOIN cursos c ON c.id_curso = m.id_curso';
 
-if (!Auth::es_admin()) {
+$soloDocente = Auth::es_docente();
+if ($soloDocente) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]
@@ -88,7 +90,7 @@ $orden    = 'm.fecha_matricula DESC';
 
 $registros = Paginador::obtener('matriculas m', $columnas, $filtros, $orden, $porPagina, $paginador->offset(), $join)->fetchAll();
 
-$periodos = Auth::es_admin()
+$periodos = !$soloDocente
     ? db()->todas("SELECT DISTINCT periodo FROM matriculas ORDER BY periodo DESC")
     : db()->todas(
         "SELECT DISTINCT m.periodo
@@ -106,7 +108,13 @@ $subtitulo = $total . ' ' . ($total === 1 ? 'inscripción' : 'inscripciones') . 
 $seccion   = 'matriculas';
 $ancho     = 'content-narrow';
 
-$accionesExtra = Auth::es_admin()
+$puedeCrear    = Auth::puede('matriculas.crear');
+$puedeEditar   = Auth::puede('matriculas.editar');
+$puedeEliminar = Auth::puede('matriculas.eliminar');
+$puedeExportar = Auth::puede('reportes.exportar');
+$puedeGestionar = $puedeEditar || $puedeEliminar;
+
+$accionesExtra = $puedeCrear
     ? '<a class="btn btn-primary btn-sm" href="crear.php">'
         . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva matrícula</a>'
     : '';
@@ -118,11 +126,11 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-head">
         <div>
             <h2>Inscripciones</h2>
-            <p><?= Auth::es_admin()
-                ? 'Estudiantes inscritos por curso y periodo'
-                : 'Inscripciones de tus cursos asignados · solo lectura' ?></p>
+            <p><?= $soloDocente
+                ? 'Inscripciones de tus cursos asignados · solo lectura'
+                : 'Estudiantes inscritos por curso y periodo' ?></p>
         </div>
-        <?php if (Auth::es_admin()): ?>
+        <?php if ($puedeExportar): ?>
         <div class="panel-actions no-print">
             <a class="btn btn-outline btn-sm"
                 href="<?= e(base_url('views/reportes/exportar.php?tipo=matriculas' . ($paramsFiltros ? '&' . http_build_query($paramsFiltros) : ''))) ?>">
@@ -184,7 +192,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </p>
                 <?php if ($paramsFiltros): ?>
                     <a class="btn btn-outline" href="listar.php">Limpiar filtros</a>
-                <?php elseif (Auth::es_admin()): ?>
+                <?php elseif ($puedeCrear): ?>
                     <a class="btn btn-primary" href="crear.php">Crear matrícula</a>
                 <?php endif; ?>
             </div>
@@ -198,10 +206,8 @@ require_once APP_ROOT . '/layout/header.php';
                             <th>Periodo</th>
                             <th>Fecha</th>
                             <th>Estado</th>
-                            <?php if (Auth::tiene_rol(1, 2)): ?>
-                                <th class="no-print" style="width:1%">Constancia</th>
-                            <?php endif; ?>
-                            <?php if (Auth::es_admin()): ?>
+                            <th class="no-print" style="width:1%">Constancia</th>
+                            <?php if ($puedeGestionar): ?>
                                 <th class="num no-print">Acciones</th>
                             <?php endif; ?>
                         </tr>
@@ -231,21 +237,20 @@ require_once APP_ROOT . '/layout/header.php';
                                         <?= e(ucfirst($m['estado'])) ?>
                                     </span>
                                 </td>
-                                <?php if (Auth::tiene_rol(1, 2)): ?>
-                                    <td class="no-print">
-                                        <a class="btn btn-outline btn-sm" style="padding:6px 9px"
-                                            href="constancia.php?id=<?= (int) $m['id_matricula'] ?>"
-                                            title="Ver constancia">
-                                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                                                <path d="M14 2v6h6M16 13H8m0 4h8" />
-                                            </svg>
-                                        </a>
-                                    </td>
-                                <?php endif; ?>
-                                <?php if (Auth::es_admin()): ?>
+                                <td class="no-print">
+                                    <a class="btn btn-outline btn-sm" style="padding:6px 9px"
+                                        href="constancia.php?id=<?= (int) $m['id_matricula'] ?>"
+                                        title="Ver constancia">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                            <path d="M14 2v6h6M16 13H8m0 4h8" />
+                                        </svg>
+                                    </a>
+                                </td>
+                                <?php if ($puedeGestionar): ?>
                                     <td class="num no-print">
                                         <div class="flex gap-sm" style="justify-content:flex-end;align-items:center">
+                                            <?php if ($puedeEditar): ?>
                                             <form method="POST" class="no-print flex gap-sm">
                                                 <?= csrf_input() ?>
                                                 <input type="hidden" name="accion" value="estado">
@@ -261,7 +266,9 @@ require_once APP_ROOT . '/layout/header.php';
                                                 </select>
                                                 <button class="btn btn-outline btn-sm" type="submit">OK</button>
                                             </form>
+                                            <?php endif; ?>
 
+                                            <?php if ($puedeEliminar): ?>
                                             <form method="POST" class="no-print"
                                                 data-confirmar="¿Eliminar la matrícula de <?= e($m['estudiante']) ?> en «<?= e($m['curso']) ?>»?">
                                                 <?= csrf_input() ?>
@@ -276,6 +283,7 @@ require_once APP_ROOT . '/layout/header.php';
                                                     </svg>
                                                 </button>
                                             </form>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 <?php endif; ?>

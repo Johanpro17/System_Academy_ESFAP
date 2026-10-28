@@ -7,10 +7,10 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('noticias.ver');
 
 $errores = [];
-$puedePublicar = Auth::es_admin();
+$puedePublicar = Auth::puede('noticias.gestionar');
 
 if (es_post()) {
     exigir_post();
@@ -18,7 +18,7 @@ if (es_post()) {
 
     /* Crear publicación */
     if ($accion === 'crear') {
-        Auth::requerir_admin();
+        Auth::requerir_permiso('noticias.gestionar');
 
         $titulo    = trim(input('titulo'));
         $contenido = trim(input('contenido'));
@@ -71,7 +71,7 @@ if (es_post()) {
 
     /* Cambiar estado */
     if ($accion === 'estado') {
-        Auth::requerir_admin();
+        Auth::requerir_permiso('noticias.gestionar');
         $id = input_int('id');
         db()->query("UPDATE noticias SET publicado = 1 - publicado WHERE id_noticia = :id", [':id' => $id]);
         Auth::registrar('actualizar', 'noticias', $id, 'Estado de publicación cambiado');
@@ -85,7 +85,7 @@ if (es_post()) {
 
     /* Destacar */
     if ($accion === 'destacar') {
-        Auth::requerir_admin();
+        Auth::requerir_permiso('noticias.gestionar');
         $id = input_int('id');
         db()->query("UPDATE noticias SET destacado = 1 - destacado WHERE id_noticia = :id", [':id' => $id]);
         Auth::registrar('actualizar', 'noticias', $id, 'Publicación destacada');
@@ -99,7 +99,7 @@ if (es_post()) {
 
     /* Eliminar */
     if ($accion === 'eliminar') {
-        Auth::requerir_admin();
+        Auth::requerir_permiso('noticias.gestionar');
         $id = input_int('id');
         db()->conectar()->prepare("DELETE FROM noticias WHERE id_noticia = :id")->execute([':id' => $id]);
         Auth::registrar('eliminar', 'noticias', $id, 'Publicación eliminada');
@@ -129,8 +129,8 @@ if ($filtro === 'publicados') {
     $filtros['n.destacado'] = 1;
 }
 
-/* Los roles sin permiso solo ven lo publicado */
-if (!Auth::es_admin()) {
+/* Los roles sin permiso de gestión solo ven lo publicado */
+if (!$puedePublicar) {
     $filtros['n.publicado'] = 1;
 }
 
@@ -292,7 +292,7 @@ require_once APP_ROOT . '/layout/header.php';
                         <?= e(trim($n['autor_n'] . ' ' . $n['autor_a']) ?: 'Sistema') ?>
                     </small>
 
-                    <?php if (Auth::es_admin()): ?>
+                    <?php if ($puedePublicar): ?>
                         <div class="flex gap-sm">
                             <form method="POST">
                                 <?= csrf_input() ?>

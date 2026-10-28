@@ -8,23 +8,132 @@ require_once __DIR__ . '/../config/database.php';
 
 class Auth
 {
-    public const ROL_ADMIN     = 1;
+    public const ROL_ADMIN      = 1;
     public const ROL_DOCENTE    = 2;
     public const ROL_ESTUDIANTE = 3;
+    public const ROL_SECRETARIA = 4;
+    public const ROL_AUDITORIA  = 5;
 
-    /** Registro de roles: id => [nombre, badge, color] */
+    /** Registro de roles: id => [nombre, clase, descripción] */
     public static function roles(): array
     {
         return [
-            self::ROL_ADMIN     => ['nombre' => 'Administrador', 'clase' => 'rol-admin'],
-            self::ROL_DOCENTE    => ['nombre' => 'Docente',       'clase' => 'rol-docente'],
-            self::ROL_ESTUDIANTE => ['nombre' => 'Estudiante',    'clase' => 'rol-estudiante'],
+            self::ROL_ADMIN      => [
+                'nombre'      => 'Administrador',
+                'clase'       => 'rol-admin',
+                'descripcion' => 'Acceso total al sistema',
+            ],
+            self::ROL_DOCENTE    => [
+                'nombre'      => 'Docente',
+                'clase'       => 'rol-docente',
+                'descripcion' => 'Gestiona notas y consulta sus cursos asignados',
+            ],
+            self::ROL_ESTUDIANTE => [
+                'nombre'      => 'Estudiante',
+                'clase'       => 'rol-estudiante',
+                'descripcion' => 'Consulta sus notas, matrículas y horarios',
+            ],
+            self::ROL_SECRETARIA => [
+                'nombre'      => 'Secretaría',
+                'clase'       => 'rol-secretaria',
+                'descripcion' => 'Gestiona estudiantes, matrículas y constancias',
+            ],
+            self::ROL_AUDITORIA  => [
+                'nombre'      => 'Auditoría',
+                'clase'       => 'rol-auditoria',
+                'descripcion' => 'Consulta toda la información y la bitácora del sistema',
+            ],
         ];
     }
 
     public static function nombre_rol(?int $id): string
     {
         return self::roles()[$id]['nombre'] ?? 'Invitado';
+    }
+
+    /**
+     * Matriz de permisos por rol. El administrador recibe comodín total.
+     *
+     * @return array<int, string[]>
+     */
+    public static function permisos_por_rol(): array
+    {
+        return [
+            self::ROL_ADMIN => ['*'],
+
+            self::ROL_DOCENTE => [
+                'dashboard.ver',
+                'estudiantes.ver',
+                'cursos.ver',
+                'matriculas.ver',
+                'notas.ver',
+                'notas.editar',
+                'horarios.ver',
+                'reportes.ver',
+                'reportes.exportar',
+                'noticias.ver',
+                'perfil.ver',
+            ],
+
+            self::ROL_ESTUDIANTE => [
+                'perfil.ver',
+            ],
+
+            self::ROL_SECRETARIA => [
+                'dashboard.ver',
+                'estudiantes.ver',
+                'estudiantes.crear',
+                'estudiantes.editar',
+                'estudiantes.eliminar',
+                'profesores.ver',
+                'cursos.ver',
+                'matriculas.ver',
+                'matriculas.crear',
+                'matriculas.editar',
+                'matriculas.eliminar',
+                'notas.ver',
+                'horarios.ver',
+                'reportes.ver',
+                'reportes.exportar',
+                'noticias.ver',
+                'usuarios.ver',
+                'perfil.ver',
+            ],
+
+            self::ROL_AUDITORIA => [
+                'dashboard.ver',
+                'estudiantes.ver',
+                'profesores.ver',
+                'cursos.ver',
+                'matriculas.ver',
+                'notas.ver',
+                'horarios.ver',
+                'reportes.ver',
+                'reportes.exportar',
+                'noticias.ver',
+                'usuarios.ver',
+                'auditoria.ver',
+                'perfil.ver',
+            ],
+        ];
+    }
+
+    /** Comprueba un permiso concreto del rol actual. */
+    public static function puede(string $permiso): bool
+    {
+        $permisos = self::permisos_por_rol()[self::rol()] ?? [];
+
+        return in_array('*', $permisos, true) || in_array($permiso, $permisos, true);
+    }
+
+    /** Ruta de inicio según el rol. */
+    public static function url_inicio(): string
+    {
+        return match (self::rol()) {
+            self::ROL_DOCENTE    => base_url('docente.php'),
+            self::ROL_ESTUDIANTE => base_url('views/estudiantes/mis_calificaciones.php'),
+            default              => base_url('dashboard.php'),
+        };
     }
 
     /**
@@ -174,6 +283,21 @@ class Auth
         return self::rol() === self::ROL_ADMIN;
     }
 
+    public static function es_docente(): bool
+    {
+        return self::rol() === self::ROL_DOCENTE;
+    }
+
+    public static function es_secretaria(): bool
+    {
+        return self::rol() === self::ROL_SECRETARIA;
+    }
+
+    public static function es_auditoria(): bool
+    {
+        return self::rol() === self::ROL_AUDITORIA;
+    }
+
     /**
      * Verifica si el usuario actual tiene alguno de los roles permitidos.
      */
@@ -228,6 +352,18 @@ class Auth
     public static function requerir_admin(): void
     {
         self::requerir_rol(self::ROL_ADMIN);
+    }
+
+    /** Guarda por permiso (preferida frente a comprobar roles sueltos). */
+    public static function requerir_permiso(string $permiso): void
+    {
+        self::requerir_login();
+
+        if (!self::puede($permiso)) {
+            http_response_code(403);
+            require_once APP_ROOT . '/public/403.php';
+            exit;
+        }
     }
 
     public static function es_estudiante(): bool

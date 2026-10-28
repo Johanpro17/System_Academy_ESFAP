@@ -138,15 +138,15 @@ final class Errores
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{$t}</title>
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f6fb;color:#0d1526;
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f3fb;color:#0d1526;
 font-family:'Segoe UI',Tahoma,sans-serif;padding:24px}
-.box{max-width:520px;background:#fff;border:1px solid #e3e8f0;border-radius:24px;padding:40px;
+.box{max-width:520px;background:#fff;border:1px solid #e6e1f1;border-radius:24px;padding:40px;
 box-shadow:0 20px 50px rgba(13,21,38,.12);text-align:center}
 .badge{width:64px;height:64px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;
-background:linear-gradient(140deg,#2563eb,#1733a5);color:#fff;font-size:1.6rem;font-weight:800}
+background:linear-gradient(140deg,#7c3aed,#5b21b6);color:#fff;font-size:1.6rem;font-weight:800}
 h1{font-size:1.3rem;margin:0 0 8px}
 p{margin:0;color:#4b5768;line-height:1.6}
-a{display:inline-block;margin-top:22px;color:#1d4ed8;font-weight:600;text-decoration:none}
+a{display:inline-block;margin-top:22px;color:#6d28d9;font-weight:600;text-decoration:none}
 </style>
 </head>
 <body>

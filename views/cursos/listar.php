@@ -6,11 +6,11 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('cursos.ver');
 
 if (es_post()) {
     exigir_post();
-    Auth::requerir_admin();
+    Auth::requerir_permiso('cursos.gestionar');
 
     if (input('accion') === 'eliminar') {
         $id = input_int('id');
@@ -41,7 +41,7 @@ $tabla = 'cursos c';
 $join = '';
 $filtros = [];
 $idProfesor = null;
-if (!Auth::es_admin()) {
+if (Auth::es_docente()) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]
@@ -75,7 +75,10 @@ $subtitulo = $total . ' ' . ($total === 1 ? 'curso' : 'cursos') . ' en el catál
 $seccion   = 'cursos';
 $ancho     = 'content-narrow';
 
-$accionesExtra = Auth::es_admin()
+$puedeGestionar = Auth::puede('cursos.gestionar');
+$puedeExportar  = Auth::puede('reportes.exportar');
+
+$accionesExtra = $puedeGestionar
     ? '<a class="btn btn-primary btn-sm" href="crear.php">'
         . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nuevo curso</a>'
     : '';
@@ -90,6 +93,7 @@ require_once APP_ROOT . '/layout/header.php';
             <p>Oferta académica, créditos y áreas de formación</p>
         </div>
         <div class="panel-actions no-print">
+            <?php if ($puedeExportar): ?>
             <a class="btn btn-outline btn-sm"
                 href="<?= e(base_url('views/reportes/exportar.php?tipo=cursos')) ?>">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -97,6 +101,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </svg>
                 Exportar CSV
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -143,7 +148,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </p>
                 <?php if ($paramsFiltros): ?>
                     <a class="btn btn-outline" href="listar.php">Limpiar filtros</a>
-                <?php elseif (Auth::es_admin()): ?>
+                <?php elseif ($puedeGestionar): ?>
                     <a class="btn btn-primary" href="crear.php">Crear curso</a>
                 <?php endif; ?>
             </div>
@@ -157,7 +162,7 @@ require_once APP_ROOT . '/layout/header.php';
                             <th>Área</th>
                             <th class="num">Créditos</th>
                             <th>Estado</th>
-                            <?php if (Auth::es_admin()): ?>
+                            <?php if ($puedeGestionar): ?>
                                 <th class="num no-print">Acciones</th>
                             <?php endif; ?>
                         </tr>
@@ -187,7 +192,7 @@ require_once APP_ROOT . '/layout/header.php';
                                         <?= $c['activo'] ? 'Activo' : 'Inactivo' ?>
                                     </span>
                                 </td>
-                                <?php if (Auth::es_admin()): ?>
+                                <?php if ($puedeGestionar): ?>
                                     <td class="num no-print">
                                         <div class="flex gap-sm" style="justify-content:flex-end">
                                             <a class="btn btn-outline btn-sm" href="editar.php?id=<?= (int) $c['id_curso'] ?>"

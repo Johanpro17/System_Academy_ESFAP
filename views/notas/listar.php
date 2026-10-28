@@ -6,17 +6,18 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('notas.ver');
 
 $errores = [];
 
-$esAdmin = Auth::es_admin();
-$idProfesor = $esAdmin ? null : db()->valor(
+$puedeEditar = Auth::puede('notas.editar');
+$soloDocente = Auth::es_docente();
+$idProfesor = $soloDocente ? db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
-);
+) : null;
 
-if ($esAdmin) {
+if (!$soloDocente) {
     $cursos = db()->todas("SELECT id_curso, codigo, nombre FROM cursos WHERE activo = 1 ORDER BY nombre ASC");
     $evaluaciones = db()->todas("SELECT id_evaluacion, id_curso, nombre, peso FROM evaluaciones ORDER BY nombre ASC");
 } elseif ($idProfesor) {
@@ -42,8 +43,8 @@ if ($esAdmin) {
     $errores[] = 'Tu cuenta todavía no está vinculada a una ficha de profesor activa.';
 }
 
-$cursoPermitido = static function (int $curso) use ($esAdmin, $idProfesor): bool {
-    if ($esAdmin) {
+$cursoPermitido = static function (int $curso) use ($soloDocente, $idProfesor): bool {
+    if (!$soloDocente) {
         return $curso > 0;
     }
     if (!$idProfesor) {
@@ -59,6 +60,7 @@ $periodos   = db()->todas("SELECT DISTINCT periodo FROM matriculas ORDER BY peri
 
 if (es_post()) {
     exigir_post();
+    Auth::requerir_permiso('notas.editar');
     $accion = input('accion');
 
     /* Crear evaluación */
@@ -240,8 +242,10 @@ $subtitulo = 'Registra y consulta calificaciones';
 $seccion   = 'notas';
 $ancho     = '';
 
-$accionesExtra = '<a class="btn btn-outline btn-sm" href="#form-eval">'
-    . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva evaluación</a>';
+$accionesExtra = $puedeEditar
+    ? '<a class="btn btn-outline btn-sm" href="#form-eval">'
+        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva evaluación</a>'
+    : '';
 
 require_once APP_ROOT . '/layout/header.php';
 ?>
@@ -250,8 +254,8 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel">
         <div class="panel-head">
             <div>
-                <h2>Cargar notas</h2>
-                <p>Selecciona curso, evaluación y periodo</p>
+                <h2><?= $puedeEditar ? 'Cargar notas' : 'Notas del curso' ?></h2>
+                <p><?= $puedeEditar ? 'Selecciona curso, evaluación y periodo' : 'Consulta de calificaciones · solo lectura' ?></p>
             </div>
         </div>
         <div class="panel-body">
@@ -310,7 +314,9 @@ require_once APP_ROOT . '/layout/header.php';
                     </svg>
                     <h3>Sin estudiantes matriculados</h3>
                     <p>No hay nadie inscrito en este curso para el periodo <?= e($periodo) ?>.</p>
-                    <a class="btn btn-primary" href="<?= e(base_url('views/matriculas/crear.php')) ?>">Ir a matrículas</a>
+                    <?php if (Auth::puede('matriculas.crear')): ?>
+                        <a class="btn btn-primary" href="<?= e(base_url('views/matriculas/crear.php')) ?>">Ir a matrículas</a>
+                    <?php endif; ?>
                 </div>
             <?php elseif (!$idEvaluacion): ?>
                 <div class="empty">
@@ -321,6 +327,32 @@ require_once APP_ROOT . '/layout/header.php';
                     <p>Hay <?= count($estudiantes) ?> estudiante(s) matriculados. Crea una evaluación si aún no existe.</p>
                 </div>
             <?php else: ?>
+                <?php if (!$puedeEditar): ?>
+                    <div class="table-wrap" style="max-height:460px;overflow-y:auto">
+                        <table class="data">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th class="num" style="width:150px">Nota (0–100)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($estudiantes as $e): ?>
+                                    <?php $nota = $notasExistentes[(int) $e['id_estudiante']] ?? null; ?>
+                                    <tr>
+                                        <td><?= e($e['nombre']) ?></td>
+                                        <td class="num tabular">
+                                            <?= $nota !== null
+                                                ? e(rtrim(rtrim((string) $nota, '0'), '.'))
+                                                : '<span class="muted">—</span>' ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="muted small mt-2">Consulta de solo lectura. La edición de notas está reservada a docentes y administradores.</p>
+                <?php else: ?>
                 <form method="POST" novalidate>
                     <?= csrf_input() ?>
                     <input type="hidden" name="accion" value="guardar_notas">
@@ -366,6 +398,7 @@ require_once APP_ROOT . '/layout/header.php';
                         </span>
                     </div>
                 </form>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
@@ -378,6 +411,7 @@ require_once APP_ROOT . '/layout/header.php';
             </div>
         </div>
         <div class="panel-body">
+            <?php if ($puedeEditar): ?>
             <form method="POST" novalidate class="form-grid mb-3">
                 <?= csrf_input() ?>
                 <input type="hidden" name="accion" value="crear_evaluacion">
@@ -423,6 +457,7 @@ require_once APP_ROOT . '/layout/header.php';
             </form>
 
             <div class="divider"></div>
+            <?php endif; ?>
 
             <?php
             $evsFiltradas = array_filter($evaluaciones, static fn($ev) => !$idCurso || (int) $ev['id_curso'] === $idCurso);
@@ -444,6 +479,7 @@ require_once APP_ROOT . '/layout/header.php';
                                 <b><?= e($ev['nombre']) ?></b>
                                 <small>Peso <?= e(rtrim(rtrim((string) $ev['peso'], '0'), '.')) ?>%</small>
                             </span>
+                            <?php if ($puedeEditar): ?>
                             <form method="POST" data-confirmar="¿Eliminar la evaluación «<?= e($ev['nombre']) ?>»? Se borrarán sus notas.">
                                 <?= csrf_input() ?>
                                 <input type="hidden" name="accion" value="eliminar_evaluacion">
@@ -455,6 +491,7 @@ require_once APP_ROOT . '/layout/header.php';
                                     </svg>
                                 </button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>

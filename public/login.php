@@ -10,7 +10,7 @@
 require_once __DIR__ . '/../core/bootstrap.php';
 
 if (Auth::esta_logueado()) {
-    redirigir(base_url('dashboard.php'));
+    redirigir(Auth::url_inicio());
 }
 
 $error   = '';
@@ -122,7 +122,7 @@ if (es_post()) {
 
                 Auth::iniciar($u);
 
-                $destino = $_SESSION['redirect_after_login'] ?? base_url('dashboard.php');
+                $destino = $_SESSION['redirect_after_login'] ?? Auth::url_inicio();
                 unset($_SESSION['redirect_after_login']);
                 redirigir($destino);
             }

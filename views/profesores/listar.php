@@ -1,15 +1,16 @@
 <?php
 
 /**
- * Listado de profesores (solo administradores).
+ * Listado de profesores: lectura para administración, secretaría y auditoría.
  */
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('profesores.ver');
 
 if (es_post()) {
     exigir_post();
+    Auth::requerir_permiso('profesores.gestionar');
 
     if (input('accion') === 'eliminar') {
         $id = input_int('id');
@@ -57,8 +58,13 @@ $subtitulo = $total . ' ' . ($total === 1 ? 'docente' : 'docentes') . ' en la pl
 $seccion   = 'profesores';
 $ancho     = 'content-narrow';
 
-$accionesExtra = '<a class="btn btn-primary btn-sm" href="crear.php">'
-    . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nuevo profesor</a>';
+$puedeGestionar = Auth::puede('profesores.gestionar');
+$puedeExportar  = Auth::puede('reportes.exportar');
+
+$accionesExtra = $puedeGestionar
+    ? '<a class="btn btn-primary btn-sm" href="crear.php">'
+        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nuevo profesor</a>'
+    : '';
 
 require_once APP_ROOT . '/layout/header.php';
 ?>
@@ -70,12 +76,14 @@ require_once APP_ROOT . '/layout/header.php';
             <p>Especialidades, contacto y estado de los profesores</p>
         </div>
         <div class="panel-actions no-print">
+            <?php if ($puedeExportar): ?>
             <a class="btn btn-outline btn-sm" href="<?= e(base_url('views/reportes/exportar.php?tipo=profesores')) ?>">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
                 </svg>
                 Exportar CSV
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -110,7 +118,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </p>
                 <?php if ($paramsFiltros): ?>
                     <a class="btn btn-outline" href="listar.php">Limpiar búsqueda</a>
-                <?php else: ?>
+                <?php elseif ($puedeGestionar): ?>
                     <a class="btn btn-primary" href="crear.php">Registrar profesor</a>
                 <?php endif; ?>
             </div>
@@ -124,7 +132,9 @@ require_once APP_ROOT . '/layout/header.php';
                             <th>Título</th>
                             <th>Contacto</th>
                             <th>Estado</th>
-                            <th class="num no-print">Acciones</th>
+                            <?php if ($puedeGestionar): ?>
+                                <th class="num no-print">Acciones</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -152,6 +162,7 @@ require_once APP_ROOT . '/layout/header.php';
                                         <?= $p['activo'] ? 'Activo' : 'Inactivo' ?>
                                     </span>
                                 </td>
+                                <?php if ($puedeGestionar): ?>
                                 <td class="num no-print">
                                     <div class="flex gap-sm" style="justify-content:flex-end">
                                         <a class="btn btn-outline btn-sm"
@@ -189,6 +200,7 @@ require_once APP_ROOT . '/layout/header.php';
                                         </form>
                                     </div>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

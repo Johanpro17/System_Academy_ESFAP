@@ -2,12 +2,12 @@
 
 /**
  * Constancia de matrícula imprimible con folio.
- * Accesible únicamente para administradores y docentes.
+ * Accesible para administración, secretaría y docentes.
  */
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('matriculas.ver');
 
 $id = input_int('id');
 
@@ -27,7 +27,7 @@ $registro = $id ? db()->fila(
             AND h.periodo = m.periodo
        LEFT JOIN profesores p ON p.id_profesor = h.id_profesor
       WHERE m.id_matricula = :id"
-        . (Auth::es_admin() ? '' : "
+        . (Auth::es_docente() ? "
             AND EXISTS (
                 SELECT 1 FROM curso_docentes cd
                  WHERE cd.id_curso = m.id_curso
@@ -36,7 +36,7 @@ $registro = $id ? db()->fila(
                         WHERE p.id_usuario = " . (int) Auth::id() . " AND p.activo = 1
                         LIMIT 1
                    )
-            )") . "
+            )" : '') . "
       ORDER BY h.id_horario IS NULL, h.id_horario
       LIMIT 1",
     [':id' => $id]

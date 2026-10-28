@@ -6,18 +6,18 @@
 
 require_once __DIR__ . '/../../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('reportes.ver');
 
 $periodo = input('periodo') ?: date('Y') . '-1';
 $q       = input('q');
 $minimo  = input('minimo');
 
-$esAdmin = Auth::es_admin();
-$idProfesor = $esAdmin ? null : db()->valor(
+$verTodo = !Auth::es_docente();
+$idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 );
-$cursosAsignados = $esAdmin ? [] : array_map(
+$cursosAsignados = $verTodo ? [] : array_map(
     'intval',
     array_column(
         db()->todas(
@@ -27,9 +27,9 @@ $cursosAsignados = $esAdmin ? [] : array_map(
         'id_curso'
     )
 );
-$listaCursos = $esAdmin ? '' : (implode(',', $cursosAsignados) ?: '0');
+$listaCursos = $verTodo ? '' : (implode(',', $cursosAsignados) ?: '0');
 
-$periodos = $esAdmin
+$periodos = $verTodo
     ? db()->todas("SELECT DISTINCT periodo FROM notas ORDER BY periodo DESC")
     : db()->todas(
         "SELECT DISTINCT n.periodo
@@ -44,7 +44,7 @@ if (!$periodos) {
 }
 
 $filtros = ['v.periodo' => $periodo];
-if (!$esAdmin) {
+if (!$verTodo) {
     $filtros['v.id_curso'] = ['in', $cursosAsignados ?: [0]];
 }
 if ($q !== '') {
@@ -73,13 +73,13 @@ $resumen = db()->fila(
     "SELECT ROUND(AVG(promedio), 2) AS promedio, MAX(promedio) AS maximo, MIN(promedio) AS minimo,
             COUNT(DISTINCT id_estudiante) AS estudiantes
        FROM v_promedio_por_curso WHERE periodo = :p"
-        . ($esAdmin ? '' : " AND id_curso IN ({$listaCursos})"),
+        . ($verTodo ? '' : " AND id_curso IN ({$listaCursos})"),
     [':p' => $periodo]
 ) ?: ['promedio' => null, 'maximo' => null, 'minimo' => null, 'estudiantes' => 0];
 
 $aprobados = (int) db()->valor(
     "SELECT COUNT(*) FROM v_promedio_por_curso WHERE periodo = :p AND promedio >= 70"
-        . ($esAdmin ? '' : " AND id_curso IN ({$listaCursos})"),
+        . ($verTodo ? '' : " AND id_curso IN ({$listaCursos})"),
     [':p' => $periodo],
     0
 );

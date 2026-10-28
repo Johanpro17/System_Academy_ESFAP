@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('reportes.exportar');
 
 $tipo = input('tipo');
 $q    = input('q');
@@ -24,12 +24,12 @@ if (!isset($titulos[$tipo])) {
     exit('Tipo de exportación no válido.');
 }
 
-$esAdmin = Auth::es_admin();
-$idProfesor = $esAdmin ? null : db()->valor(
+$verTodo = !Auth::es_docente();
+$idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 );
-if (!$esAdmin && $tipo === 'profesores') {
+if (Auth::es_docente() && $tipo === 'profesores') {
     http_response_code(403);
     exit('No tienes permiso para exportar el padrón de profesores.');
 }
@@ -47,7 +47,7 @@ switch ($tipo) {
                      'esp.nombre AS especialidad'];
         $join = 'JOIN usuarios u ON u.id_usuario = e.id_usuario
                  JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
-        if (!$esAdmin) {
+        if (!$verTodo) {
             $join .= ' JOIN (
                 SELECT DISTINCT m.id_estudiante
                   FROM matriculas m
@@ -78,7 +78,7 @@ switch ($tipo) {
         break;
 
     case 'cursos':
-        if ($esAdmin) {
+        if ($verTodo) {
             $filas = db()->todas("SELECT codigo, nombre, area, creditos, descripcion, activo, creado_en FROM cursos ORDER BY nombre");
         } else {
             $filas = db()->todas(
@@ -105,7 +105,7 @@ switch ($tipo) {
         $join = 'JOIN estudiantes e ON e.id_estudiante = m.id_estudiante
                  JOIN usuarios u ON u.id_usuario = e.id_usuario
                  JOIN cursos c ON c.id_curso = m.id_curso';
-        if (!$esAdmin) {
+        if (!$verTodo) {
             $join .= ' JOIN curso_docentes cd ON cd.id_curso = m.id_curso';
             $filtros['cd.id_profesor'] = $idProfesor ?: 0;
         }
@@ -132,7 +132,7 @@ switch ($tipo) {
                  JOIN usuarios u ON u.id_usuario = e.id_usuario
                  JOIN cursos c ON c.id_curso = n.id_curso
                  JOIN evaluaciones ev ON ev.id_evaluacion = n.id_evaluacion';
-        if (!$esAdmin) {
+        if (!$verTodo) {
             $join .= ' JOIN curso_docentes cd ON cd.id_curso = n.id_curso';
             $filtros['cd.id_profesor'] = $idProfesor ?: 0;
         }

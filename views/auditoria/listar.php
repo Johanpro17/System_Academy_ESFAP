@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Bitácora de auditoría del sistema (solo administradores).
+ * Bitácora de auditoría del sistema (administración y auditoría).
  */
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('auditoria.ver');
 
 $q        = input('q');
 $accion   = input('accion_filtro');

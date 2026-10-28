@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('profesores.gestionar');
 
 $id       = input_int('id');
 $editando = $id > 0;

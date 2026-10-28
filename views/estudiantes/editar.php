@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('estudiantes.editar');
 
 $id = input_int('id');
 

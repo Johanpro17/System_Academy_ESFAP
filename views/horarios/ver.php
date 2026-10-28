@@ -6,15 +6,15 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('horarios.ver');
 
 $periodo = input('periodo') ?: date('Y') . '-1';
 $idCurso = input_int('curso');
-$esAdmin = Auth::es_admin();
-$idProfesor = $esAdmin ? null : db()->valor(
+$soloDocente = Auth::es_docente();
+$idProfesor = $soloDocente ? db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
-);
+) : null;
 
 $dias    = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 /* La base puede guardar los días con o sin tilde: se normalizan para agrupar */
@@ -35,7 +35,7 @@ $normalizarDia = static function (string $dia): string {
 };
 $franjas = ['07:00', '09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
 
-if ($esAdmin) {
+if (!$soloDocente) {
     $cursos = db()->todas("SELECT id_curso, codigo, nombre FROM cursos WHERE activo = 1 ORDER BY nombre ASC");
 } elseif ($idProfesor) {
     $cursos = db()->todas(
@@ -50,7 +50,7 @@ if ($esAdmin) {
     $cursos = [];
 }
 
-if ($idCurso && !$esAdmin && !in_array($idCurso, array_map('intval', array_column($cursos, 'id_curso')), true)) {
+if ($idCurso && $soloDocente && !in_array($idCurso, array_map('intval', array_column($cursos, 'id_curso')), true)) {
     $idCurso = 0;
 }
 
@@ -70,13 +70,13 @@ try {
            JOIN profesores p ON p.id_profesor = h.id_profesor
           WHERE h.periodo = :p"
             . ($idCurso ? ' AND h.id_curso = :c' : '')
-            . (!$esAdmin ? ' AND h.id_profesor = :profesor' : '') . "
+            . ($soloDocente ? ' AND h.id_profesor = :profesor' : '') . "
           ORDER BY FIELD(h.dia_semana,'Lunes','Martes','Miércoles','Miercoles','Jueves','Viernes','Sábado','Sabado','Domingo'),
                    h.hora_inicio",
         array_merge(
             [':p' => $periodo],
             $idCurso ? [':c' => $idCurso] : [],
-            !$esAdmin ? [':profesor' => $idProfesor ?? 0] : []
+            $soloDocente ? [':profesor' => $idProfesor ?? 0] : []
         )
     );
 } catch (Throwable $e) {

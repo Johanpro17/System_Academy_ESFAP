@@ -7,7 +7,7 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_admin();
+Auth::requerir_permiso('matriculas.crear');
 
 $errores = [];
 

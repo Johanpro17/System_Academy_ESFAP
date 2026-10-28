@@ -59,10 +59,12 @@ function nav_link(string $clave, string $ruta, string $texto, string $actual, ar
     echo '</a>';
 }
 
-$esAdmin   = Auth::es_admin();
-$esDocente = Auth::tiene_rol(1, 2);
+$esAdmin      = Auth::es_admin();
+$esDocente    = Auth::es_docente();
 $esEstudiante = Auth::es_estudiante();
-$rol       = Auth::rol();
+$esSecretaria = Auth::es_secretaria();
+$esAuditoria  = Auth::es_auditoria();
+$rol          = Auth::rol();
 ?>
 <!DOCTYPE html>
 <html lang="es" data-theme="<?= e($tema) ?>">
@@ -96,37 +98,49 @@ $rol       = Auth::rol();
                     <?php nav_link('perfil', 'perfil.php', 'Mi perfil', $paginaActual, $iconos); ?>
                     <?php nav_link('salir', 'logout.php', 'Cerrar sesión', $paginaActual, $iconos); ?>
                 <?php else: ?>
-                    <?php nav_link('dashboard', $esAdmin ? 'dashboard.php' : 'docente.php', 'Resumen', $paginaActual, $iconos); ?>
+                    <?php nav_link('dashboard', $esDocente ? 'docente.php' : 'dashboard.php', 'Resumen', $paginaActual, $iconos); ?>
 
                     <div class="nav-label">Registros</div>
-                    <?php if ($esDocente): ?>
+                    <?php if (Auth::puede('estudiantes.ver')): ?>
                         <?php nav_link('estudiantes', 'views/estudiantes/listar.php', 'Estudiantes', $paginaActual, $iconos); ?>
                     <?php endif; ?>
-                    <?php if ($esAdmin): ?>
+                    <?php if (Auth::puede('profesores.ver')): ?>
                         <?php nav_link('profesores', 'views/profesores/listar.php', 'Profesores', $paginaActual, $iconos); ?>
                     <?php endif; ?>
-                    <?php nav_link('cursos', 'views/cursos/listar.php', 'Cursos', $paginaActual, $iconos); ?>
+                    <?php if (Auth::puede('cursos.ver')): ?>
+                        <?php nav_link('cursos', 'views/cursos/listar.php', 'Cursos', $paginaActual, $iconos); ?>
+                    <?php endif; ?>
 
                     <div class="nav-label">Gestión</div>
-                    <?php if ($esDocente): ?>
+                    <?php if (Auth::puede('matriculas.ver')): ?>
                         <?php nav_link('matriculas', 'views/matriculas/listar.php', 'Matrículas', $paginaActual, $iconos); ?>
+                    <?php endif; ?>
+                    <?php if (Auth::puede('notas.ver')): ?>
                         <?php nav_link('notas', 'views/notas/listar.php', 'Notas', $paginaActual, $iconos); ?>
                     <?php endif; ?>
-                    <?php nav_link('horarios', 'views/horarios/ver.php', 'Horarios', $paginaActual, $iconos); ?>
+                    <?php if (Auth::puede('horarios.ver')): ?>
+                        <?php nav_link('horarios', 'views/horarios/ver.php', 'Horarios', $paginaActual, $iconos); ?>
+                    <?php endif; ?>
 
                     <div class="nav-label">Comunicación</div>
-                    <?php nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos); ?>
+                    <?php if (Auth::puede('noticias.ver')): ?>
+                        <?php nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos); ?>
+                    <?php endif; ?>
 
-                    <?php if ($esDocente): ?>
+                    <?php if (Auth::puede('reportes.ver')): ?>
                         <div class="nav-label">Reportes</div>
                         <?php nav_link('reportes', 'views/reportes/generar.php', 'Generar reportes', $paginaActual, $iconos); ?>
                         <?php nav_link('reportes', 'views/estudiantes/reportes/promedios.php', 'Promedios', $paginaActual, $iconos); ?>
                     <?php endif; ?>
 
-                    <?php if ($esAdmin): ?>
+                    <?php if (Auth::puede('usuarios.ver') || Auth::puede('auditoria.ver')): ?>
                         <div class="nav-label">Administración</div>
-                        <?php nav_link('usuarios', 'views/usuarios/listar.php', 'Usuarios', $paginaActual, $iconos); ?>
-                        <?php nav_link('auditoria', 'views/auditoria/listar.php', 'Auditoría', $paginaActual, $iconos); ?>
+                        <?php if (Auth::puede('usuarios.ver')): ?>
+                            <?php nav_link('usuarios', 'views/usuarios/listar.php', 'Usuarios', $paginaActual, $iconos); ?>
+                        <?php endif; ?>
+                        <?php if (Auth::puede('auditoria.ver')): ?>
+                            <?php nav_link('auditoria', 'views/auditoria/listar.php', 'Auditoría', $paginaActual, $iconos); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
 
                     <div class="nav-label">Cuenta</div>

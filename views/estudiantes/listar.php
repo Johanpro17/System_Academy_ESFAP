@@ -6,13 +6,13 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('estudiantes.ver');
 
 /* ---------------- Procesamiento ---------------- */
 
 if (es_post()) {
     exigir_post();
-    Auth::requerir_admin();
+    Auth::requerir_permiso('estudiantes.eliminar');
 
     $accion = input('accion');
 
@@ -56,8 +56,8 @@ if ($estado !== '') {
 $join = 'INNER JOIN usuarios u ON u.id_usuario = e.id_usuario
          INNER JOIN especialidades esp ON esp.id_especialidad = e.id_especialidad';
 
-$esAdmin = Auth::es_admin();
-if (!$esAdmin) {
+$soloDocente = Auth::es_docente();
+if ($soloDocente) {
     $idProfesor = db()->valor(
         "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
         [':u' => Auth::id()]
@@ -100,7 +100,13 @@ $subtitulo = $total . ' ' . ($total === 1 ? 'registro' : 'registros') . ' encont
 $seccion   = 'estudiantes';
 $ancho     = 'content-narrow';
 
-$accionesExtra = Auth::es_admin()
+$puedeCrear    = Auth::puede('estudiantes.crear');
+$puedeEditar   = Auth::puede('estudiantes.editar');
+$puedeEliminar = Auth::puede('estudiantes.eliminar');
+$puedeExportar = Auth::puede('reportes.exportar');
+$puedeGestionar = $puedeEditar || $puedeEliminar;
+
+$accionesExtra = $puedeCrear
     ? '<a class="btn btn-primary btn-sm" href="crear.php">'
         . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nuevo estudiante</a>'
     : '';
@@ -112,11 +118,11 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-head">
         <div>
             <h2>Padrón de estudiantes</h2>
-            <p><?= Auth::es_admin()
-                ? 'Busca por nombre, correo, matrícula o DNI'
-                : 'Estudiantes inscritos en tus cursos asignados' ?></p>
+            <p><?= $soloDocente
+                ? 'Estudiantes inscritos en tus cursos asignados'
+                : 'Busca por nombre, correo, matrícula o DNI' ?></p>
         </div>
-        <?php if (Auth::es_admin()): ?>
+        <?php if ($puedeExportar): ?>
         <div class="panel-actions no-print">
             <a class="btn btn-outline btn-sm"
                 href="<?= e(base_url('views/reportes/exportar.php?tipo=estudiantes' . ($paramsFiltros ? '&' . http_build_query($paramsFiltros) : ''))) ?>">
@@ -184,7 +190,7 @@ require_once APP_ROOT . '/layout/header.php';
                 </p>
                 <?php if ($paramsFiltros): ?>
                     <a class="btn btn-outline" href="listar.php">Limpiar filtros</a>
-                <?php elseif (Auth::es_admin()): ?>
+                <?php elseif ($puedeCrear): ?>
                     <a class="btn btn-primary" href="crear.php">Registrar estudiante</a>
                 <?php endif; ?>
             </div>
@@ -199,7 +205,7 @@ require_once APP_ROOT . '/layout/header.php';
                             <th>Especialidad</th>
                             <th>Ingreso</th>
                             <th>Estado</th>
-                            <?php if (Auth::es_admin()): ?>
+                            <?php if ($puedeGestionar): ?>
                                 <th class="num no-print">Acciones</th>
                             <?php endif; ?>
                         </tr>
@@ -231,28 +237,32 @@ require_once APP_ROOT . '/layout/header.php';
                                         <?= e(ucfirst($row['estado'] ?? 'activo')) ?>
                                     </span>
                                 </td>
-                                <?php if (Auth::es_admin()): ?>
+                                <?php if ($puedeGestionar): ?>
                                     <td class="num no-print">
                                         <div class="flex gap-sm" style="justify-content:flex-end">
-                                            <a class="btn btn-outline btn-sm"
-                                                href="editar.php?id=<?= (int) $row['id_estudiante'] ?>"
-                                                title="Editar">
-                                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.4-9.4a2 2 0 112.8 2.8L11.5 15.5l-4 1 1-4 9-9z" />
-                                                </svg>
-                                            </a>
-                                            <form method="POST" class="no-print"
-                                                data-confirmar="¿Eliminar a <?= e($row['nombre']) ?>? Esta acción no se puede deshacer.">
-                                                <?= csrf_input() ?>
-                                                <input type="hidden" name="accion" value="eliminar">
-                                                <input type="hidden" name="id" value="<?= (int) $row['id_estudiante'] ?>">
-                                                <button class="btn btn-ghost btn-sm" type="submit" title="Eliminar"
-                                                    style="color:var(--danger)">
+                                            <?php if ($puedeEditar): ?>
+                                                <a class="btn btn-outline btn-sm"
+                                                    href="editar.php?id=<?= (int) $row['id_estudiante'] ?>"
+                                                    title="Editar">
                                                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                                                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.4-9.4a2 2 0 112.8 2.8L11.5 15.5l-4 1 1-4 9-9z" />
                                                     </svg>
-                                                </button>
-                                            </form>
+                                                </a>
+                                            <?php endif; ?>
+                                            <?php if ($puedeEliminar): ?>
+                                                <form method="POST" class="no-print"
+                                                    data-confirmar="¿Eliminar a <?= e($row['nombre']) ?>? Esta acción no se puede deshacer.">
+                                                    <?= csrf_input() ?>
+                                                    <input type="hidden" name="accion" value="eliminar">
+                                                    <input type="hidden" name="id" value="<?= (int) $row['id_estudiante'] ?>">
+                                                    <button class="btn btn-ghost btn-sm" type="submit" title="Eliminar"
+                                                        style="color:var(--danger)">
+                                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 <?php endif; ?>

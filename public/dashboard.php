@@ -13,11 +13,18 @@ if (Auth::es_estudiante()) {
     redirigir(base_url('views/estudiantes/mis_calificaciones.php'));
 }
 
-if (!Auth::es_admin()) {
+if (Auth::es_docente()) {
     redirigir(base_url('docente.php'));
 }
 
-$esAdmin = Auth::es_admin();
+if (!Auth::puede('dashboard.ver')) {
+    redirigir(Auth::url_inicio());
+}
+
+$esAdmin      = Auth::es_admin();
+$esSecretaria = Auth::es_secretaria();
+$esAuditoria  = Auth::es_auditoria();
+$puedeAuditoria = Auth::puede('auditoria.ver');
 
 /* ------------------------------------------------------------------
  * Indicadores
@@ -138,7 +145,7 @@ try {
 }
 
 $actividad = [];
-if ($esAdmin) {
+if ($puedeAuditoria) {
     try {
         $actividad = db()->todas(
             "SELECT a.accion, a.entidad, a.detalle, a.creado_en,
@@ -153,17 +160,26 @@ if ($esAdmin) {
     }
 }
 
-$titulo    = $esAdmin ? 'Resumen general' : 'Panel docente';
-$subtitulo = $esAdmin
-    ? 'Panel de control · ' . APP_INSTITUCION
-    : 'Cursos, evaluaciones y calificaciones · ' . APP_INSTITUCION;
+$titulo = $esSecretaria
+    ? 'Panel de secretaría'
+    : ($esAuditoria ? 'Panel de auditoría' : 'Resumen general');
+
+$subtitulo = 'Panel de control · ' . APP_INSTITUCION;
 $seccion   = 'dashboard';
 
-$accionesExtra = $esAdmin
-    ? '<a class="btn btn-primary btn-sm" href="' . e(base_url('views/matriculas/crear.php')) . '">'
-        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva matrícula</a>'
-    : '<a class="btn btn-primary btn-sm" href="' . e(base_url('views/notas/listar.php')) . '">'
-        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Gestionar calificaciones</a>';
+if (Auth::puede('matriculas.crear')) {
+    $accionesExtra = '<a class="btn btn-primary btn-sm" href="' . e(base_url('views/matriculas/crear.php')) . '">'
+        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva matrícula</a>';
+} elseif ($puedeAuditoria) {
+    $accionesExtra = '<a class="btn btn-outline btn-sm" href="' . e(base_url('views/auditoria/listar.php')) . '">'
+        . '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12h6m-6 4h6M9 8h2m9-2v16l-3-2-3 2-3-2-3 2V6a2 2 0 012-2h6l3 2z"/></svg> Ver auditoría</a>';
+} else {
+    $accionesExtra = '';
+}
+
+$eyebrow = $esAdmin
+    ? 'Panel de administración'
+    : ($esSecretaria ? 'Panel de secretaría' : 'Panel de auditoría');
 
 require_once APP_ROOT . '/layout/header.php';
 ?>
@@ -172,23 +188,43 @@ require_once APP_ROOT . '/layout/header.php';
 
 <section class="dashboard-welcome" aria-labelledby="dashboard-welcome-title">
     <div class="dashboard-welcome-copy">
-        <span class="eyebrow">Panel de administración</span>
+        <span class="eyebrow"><?= e($eyebrow) ?></span>
         <h2 id="dashboard-welcome-title">Hola, <?= e(Auth::nombre()) ?></h2>
         <p>Este es el resumen de la actividad académica de <?= e(APP_INSTITUCION) ?>.</p>
     </div>
     <div class="dashboard-quick-actions" aria-label="Accesos rápidos">
-        <a class="btn btn-primary" href="<?= e(base_url('views/estudiantes/crear.php')) ?>">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6m-3-3h6" />
-            </svg>
-            Nuevo estudiante
-        </a>
-        <a class="btn btn-outline" href="<?= e(base_url('views/cursos/crear.php')) ?>">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-            </svg>
-            Nuevo curso
-        </a>
+        <?php if (Auth::puede('estudiantes.crear')): ?>
+            <a class="btn btn-primary" href="<?= e(base_url('views/estudiantes/crear.php')) ?>">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6m-3-3h6" />
+                </svg>
+                Nuevo estudiante
+            </a>
+        <?php endif; ?>
+        <?php if (Auth::puede('matriculas.crear')): ?>
+            <a class="btn btn-outline" href="<?= e(base_url('views/matriculas/crear.php')) ?>">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+                Nueva matrícula
+            </a>
+        <?php endif; ?>
+        <?php if (Auth::puede('cursos.gestionar')): ?>
+            <a class="btn btn-outline" href="<?= e(base_url('views/cursos/crear.php')) ?>">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Nuevo curso
+            </a>
+        <?php endif; ?>
+        <?php if ($puedeAuditoria && !Auth::puede('matriculas.crear')): ?>
+            <a class="btn btn-primary" href="<?= e(base_url('views/auditoria/listar.php')) ?>">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 12h6m-6 4h6M9 8h2m9-2v16l-3-2-3 2-3-2-3 2V6a2 2 0 012-2h6l3 2z" />
+                </svg>
+                Revisar bitácora
+            </a>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -358,22 +394,36 @@ require_once APP_ROOT . '/layout/header.php';
 <div class="grid-3 mod-grid mb-3">
     <?php
     $modulos = [
-        Auth::tiene_rol(1, 2)
-            ? ['estudiantes', 'views/estudiantes/listar.php', 'Estudiantes', 'Registra y consulta el padrón de alumnos por especialidad.', $totales['estudiantes'] . ' registros', '']
+        Auth::puede('estudiantes.ver')
+            ? ['estudiantes', 'views/estudiantes/listar.php', 'Estudiantes', 'Consulta el padrón de alumnos y filtra por especialidad.', $totales['estudiantes'] . ' registros', '']
             : null,
-        ['cursos', 'views/cursos/listar.php', 'Cursos', 'Administra la oferta académica, créditos y áreas de formación.', $totales['cursos'] . ' activos', 'is-ok'],
-        Auth::tiene_rol(1, 2)
-            ? ['matriculas', 'views/matriculas/listar.php', 'Matrículas', 'Inscribe estudiantes en cursos y gestiona los periodos.', $totales['matriculas'] . ' históricas', 'is-warn']
+        Auth::puede('cursos.ver')
+            ? ['cursos', 'views/cursos/listar.php', 'Cursos', 'Consulta la oferta académica, créditos y áreas de formación.', $totales['cursos'] . ' activos', 'is-ok']
             : null,
-        Auth::tiene_rol(1, 2)
-            ? ['notas', 'views/notas/listar.php', 'Notas', 'Registra evaluaciones y calificaciones por estudiante.', $totales['evaluaciones'] . ' evaluaciones', 'is-gold']
+        Auth::puede('matriculas.ver')
+            ? ['matriculas', 'views/matriculas/listar.php', 'Matrículas', 'Inscripciones por curso, periodo y estado académico.', $totales['matriculas'] . ' históricas', 'is-warn']
             : null,
-        ['horarios', 'views/horarios/ver.php', 'Horarios', 'Consulta la programación semanal de clases y aulas.', 'Semanal', ''],
-        Auth::tiene_rol(1, 2)
+        Auth::puede('notas.ver')
+            ? ['notas', 'views/notas/listar.php', 'Notas', 'Evaluaciones y calificaciones por estudiante.', $totales['evaluaciones'] . ' evaluaciones', 'is-gold']
+            : null,
+        Auth::puede('horarios.ver')
+            ? ['horarios', 'views/horarios/ver.php', 'Horarios', 'Programación semanal de clases y aulas.', 'Semanal', '']
+            : null,
+        Auth::puede('reportes.ver')
             ? ['reportes', 'views/reportes/generar.php', 'Reportes', 'Genera y exporta documentos en CSV y PDF.', 'Exportable', 'is-ok']
             : null,
-        ['noticias', 'views/noticias/listar.php', 'Noticias', 'Avisos, eventos y comunicados de la institución.', 'Institucional', ''],
-        ['perfil', 'public/perfil.php', 'Mi perfil', 'Actualiza tus datos y la contraseña de acceso.', 'Personal', 'is-ok'],
+        Auth::puede('noticias.ver')
+            ? ['noticias', 'views/noticias/listar.php', 'Noticias', 'Avisos, eventos y comunicados de la institución.', 'Institucional', '']
+            : null,
+        Auth::puede('usuarios.ver')
+            ? ['usuarios', 'views/usuarios/listar.php', 'Usuarios', 'Cuentas, roles y estado de acceso al sistema.', 'Seguridad', 'is-warn']
+            : null,
+        Auth::puede('auditoria.ver')
+            ? ['auditoria', 'views/auditoria/listar.php', 'Auditoría', 'Trazabilidad de las acciones realizadas en el sistema.', 'Bitácora', 'is-gold']
+            : null,
+        Auth::puede('perfil.ver')
+            ? ['perfil', 'perfil.php', 'Mi perfil', 'Actualiza tus datos y la contraseña de acceso.', 'Personal', 'is-ok']
+            : null,
     ];
     $modulos = array_values(array_filter($modulos));
 
@@ -392,6 +442,8 @@ require_once APP_ROOT . '/layout/header.php';
                         'horarios'    => 'M12 6v6l4 2M12 22a10 10 0 100-20 10 10 0 000 20z',
                         'reportes'    => 'M4 20V10m5 10V4m5 16v-7m5 7V8',
                         'noticias'    => 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2zM7 8h7M7 12h10M7 16h6',
+                        'usuarios'    => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75',
+                        'auditoria'   => 'M9 12h6m-6 4h6M9 8h2m9-2v16l-3-2-3 2-3-2-3 2V6a2 2 0 012-2h6l3 2z',
                         'perfil'      => 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z',
                     ];
                     ?>
@@ -453,18 +505,18 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel" data-animar data-animar-delay="1">
         <div class="panel-head">
             <div>
-                <h2><?= $esAdmin ? 'Auditoría reciente' : 'Noticias institucionales' ?></h2>
-                <p><?= $esAdmin ? 'Últimas acciones registradas en el sistema' : 'Comunicados de la institución' ?></p>
+                <h2><?= $puedeAuditoria ? 'Auditoría reciente' : 'Noticias institucionales' ?></h2>
+                <p><?= $puedeAuditoria ? 'Últimas acciones registradas en el sistema' : 'Comunicados de la institución' ?></p>
             </div>
             <div class="panel-actions">
                 <a class="btn btn-ghost btn-sm"
-                    href="<?= e(base_url($esAdmin ? 'views/auditoria/listar.php' : 'views/noticias/listar.php')) ?>">
+                    href="<?= e(base_url($puedeAuditoria ? 'views/auditoria/listar.php' : 'views/noticias/listar.php')) ?>">
                     Ver todo
                 </a>
             </div>
         </div>
 
-        <?php if ($esAdmin && !$actividad): ?>
+        <?php if ($puedeAuditoria && !$actividad): ?>
             <div class="empty">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M9 12h6m-6 4h6M9 8h2m9-2v16l-3-2-3 2-3-2-3 2V6a2 2 0 012-2h6l3 2z" />
@@ -472,7 +524,7 @@ require_once APP_ROOT . '/layout/header.php';
                 <h3>Sin actividad registrada</h3>
                 <p>Las acciones que lleves a cabo quedarán registradas aquí automáticamente.</p>
             </div>
-        <?php elseif ($esAdmin): ?>
+        <?php elseif ($puedeAuditoria): ?>
             <div class="panel-body">
                 <div class="timeline">
                     <?php foreach ($actividad as $a): ?>

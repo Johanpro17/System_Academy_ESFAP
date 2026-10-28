@@ -6,14 +6,14 @@
 
 require_once __DIR__ . '/../../core/bootstrap.php';
 
-Auth::requerir_rol(1, 2);
+Auth::requerir_permiso('reportes.ver');
 
-$esAdmin = Auth::es_admin();
-$idProfesor = $esAdmin ? null : db()->valor(
+$verTodo = !Auth::es_docente();
+$idProfesor = $verTodo ? null : db()->valor(
     "SELECT id_profesor FROM profesores WHERE id_usuario = :u AND activo = 1 LIMIT 1",
     [':u' => Auth::id()]
 );
-$cursosAsignados = $esAdmin ? [] : array_map(
+$cursosAsignados = $verTodo ? [] : array_map(
     'intval',
     array_column(
         db()->todas(
@@ -23,11 +23,11 @@ $cursosAsignados = $esAdmin ? [] : array_map(
         'id_curso'
     )
 );
-$listaCursos = $esAdmin ? '' : (implode(',', $cursosAsignados) ?: '0');
+$listaCursos = $verTodo ? '' : (implode(',', $cursosAsignados) ?: '0');
 
 $periodo = input('periodo') ?: date('Y') . '-1';
 
-$periodos = $esAdmin
+$periodos = $verTodo
     ? db()->todas("SELECT periodo, COUNT(*) AS total FROM matriculas GROUP BY periodo ORDER BY periodo DESC LIMIT 12")
     : db()->todas(
         "SELECT m.periodo, COUNT(*) AS total
@@ -44,7 +44,7 @@ if (!$periodos) {
     $periodos = [['periodo' => date('Y') . '-1', 'total' => 0]];
 }
 
-$cursos = $esAdmin
+$cursos = $verTodo
     ? db()->todas("SELECT id_curso, nombre FROM cursos WHERE activo = 1 ORDER BY nombre")
     : db()->todas(
         "SELECT c.id_curso, c.nombre
@@ -57,7 +57,7 @@ $cursos = $esAdmin
 
 /* ---------------- Indicadores del periodo ---------------- */
 
-$kpis = ($esAdmin
+$kpis = ($verTodo
     ? db()->fila(
         "SELECT
             (SELECT COUNT(DISTINCT m.id_estudiante) FROM matriculas m WHERE m.periodo = :p1) AS estudiantes,
@@ -81,7 +81,7 @@ $kpis = ($esAdmin
 
 $aprobacion = (int) db()->valor(
     "SELECT COALESCE(SUM(m.estado = 'aprobado'), 0) FROM matriculas m WHERE m.periodo = :p"
-        . ($esAdmin ? '' : " AND m.id_curso IN ({$listaCursos})"),
+        . ($verTodo ? '' : " AND m.id_curso IN ({$listaCursos})"),
     [':p' => $periodo],
     0
 );
@@ -90,15 +90,15 @@ $porCurso = db()->todas(
     "SELECT c.nombre AS curso, c.creditos, COUNT(m.id_matricula) AS inscritos,
             ROUND(AVG(n.promedio), 2) AS promedio
        FROM cursos c
-       " . ($esAdmin ? '' : "JOIN curso_docentes cd ON cd.id_curso = c.id_curso
+       " . ($verTodo ? '' : "JOIN curso_docentes cd ON cd.id_curso = c.id_curso
        ") . "
        LEFT JOIN matriculas m ON m.id_curso = c.id_curso AND m.periodo = :p1
        LEFT JOIN (
             SELECT id_curso, AVG(valor) AS promedio FROM notas
-             WHERE periodo = :p2" . ($esAdmin ? '' : " AND id_curso IN ({$listaCursos})") . "
+             WHERE periodo = :p2" . ($verTodo ? '' : " AND id_curso IN ({$listaCursos})") . "
              GROUP BY id_curso
        ) n ON n.id_curso = c.id_curso
-      WHERE c.activo = 1" . ($esAdmin ? '' : " AND cd.id_profesor = " . (int) ($idProfesor ?: 0)) . "
+      WHERE c.activo = 1" . ($verTodo ? '' : " AND cd.id_profesor = " . (int) ($idProfesor ?: 0)) . "
       GROUP BY c.id_curso
       ORDER BY inscritos DESC, c.nombre",
     [':p1' => $periodo, ':p2' => $periodo]
@@ -109,7 +109,7 @@ $topEstudiantes = db()->todas(
        FROM v_promedio_por_curso v
        JOIN estudiantes e ON e.id_estudiante = v.id_estudiante
       WHERE v.periodo = :p
-      " . ($esAdmin ? '' : "AND v.id_curso IN ({$listaCursos})") . "
+      " . ($verTodo ? '' : "AND v.id_curso IN ({$listaCursos})") . "
       GROUP BY v.id_estudiante
       ORDER BY promedio DESC
       LIMIT 8",
