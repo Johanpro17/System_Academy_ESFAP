@@ -1,5 +1,15 @@
 # Estado del sistema
 
+## Navegación agrupada y permisos mínimos (2026-11-02)
+
+- El menú lateral es un acordeón: **Registros**, **Gestión**, **Comunicación**, **Reportes**, **Administración** y **Cuenta** se despliegan al hacer clic y recuerdan su estado en `localStorage`.
+- Cada grupo y cada enlace se imprimen solo si el rol tiene permiso dentro de él (`Auth::puede()`).
+- `nav_pagina_actual()` y `nav_coincide()` sustituyen la comparación por `basename()`, que marcaba como activos todos los `.../listar.php`.
+- Profesor: solo Resumen, Gestión (Notas, Horario) y Reportes; pierde Registros, Matrículas, Noticias y Administración.
+- Secretaría: pierde Noticias; conserva Registros, Matrículas, Horarios y Reportes.
+- `views/reportes/exportar.php` exige ahora el permiso del módulo exportado (`estudiantes.ver`, `cursos.ver`, `matriculas.ver`, `notas.ver`, `profesores.ver`), no solo `reportes.exportar`.
+- Matriz completa en [`docs/PERMISOS.md`](PERMISOS.md).
+
 ## Refactor de modelo académico y base de datos (2026-10-28)
 
 ### Roles
@@ -11,8 +21,8 @@
 
 ### Permisos por rol (2026-10-28)
 
-- Profesor limitado a resumen, sus estudiantes, sus cursos, sus notas y su horario.
-- Secretaría sin notas, usuarios ni auditoría; no puede eliminar estudiantes ni matrículas.
+- Profesor limitado a resumen, notas, horario y reportes de sus cursos.
+- Secretaría sin notas, noticias, usuarios ni auditoría; no puede eliminar estudiantes ni matrículas.
 - Auditoría en solo lectura global, sin noticias; su panel muestra la bitácora.
 - Menú, dashboard y enlaces contextuales se generan con `Auth::puede()`; un acceso directo sin permiso responde 403.
 - Matriz completa en [`docs/PERMISOS.md`](PERMISOS.md).

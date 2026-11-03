@@ -181,7 +181,9 @@ require_once APP_ROOT . '/layout/header.php';
             <h3>No hay horarios para este periodo</h3>
             <p>Todavía no se han asignado bloques de clase. Los horarios se registran desde phpMyAdmin
                 o mediante el script de carga inicial.</p>
-            <a class="btn btn-outline" href="<?= e(base_url('views/cursos/listar.php')) ?>">Ver cursos</a>
+            <?php if (Auth::puede('cursos.ver')): ?>
+                <a class="btn btn-outline" href="<?= e(base_url('views/cursos/listar.php')) ?>">Ver cursos</a>
+            <?php endif; ?>
         </div>
     </div>
 <?php else: ?>

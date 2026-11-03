@@ -16,7 +16,7 @@ $subtitulo     = $subtitulo     ?? '';
 $seccion       = $seccion       ?? '';
 $ancho         = $ancho         ?? '';
 $accionesExtra = $accionesExtra ?? '';
-$paginaActual  = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$paginaActual  = nav_pagina_actual();
 
 $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
 if ($tema !== 'oscuro' && $tema !== 'claro') {
@@ -40,7 +40,53 @@ $iconos = [
     'usuarios'      => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75',
     'perfil'        => 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z',
     'salir'         => 'M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9',
+
+    /* Íconos de los grupos plegables del menú */
+    'grupo_registros'      => 'M3 7a2 2 0 012-2h3.6l2 2H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z',
+    'grupo_gestion'        => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-1 8l2 2 4-4',
+    'grupo_comunicacion'   => 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2zM7 10h7M7 14h5',
+    'grupo_reportes'       => 'M4 20V10m5 10V4m5 16v-7m5 7V8',
+    'grupo_administracion' => 'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.08a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.08a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.08a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z',
+    'grupo_cuenta'         => 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z',
 ];
+
+/**
+ * Ruta de la página actual en la misma forma que usan los enlaces del menú
+ * ('dashboard.php', 'views/estudiantes/listar.php', ...).
+ */
+function nav_pagina_actual(): string
+{
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+
+    foreach (['/public/', '/views/'] as $marcador) {
+        $pos = strpos($script, $marcador);
+        if ($pos !== false) {
+            $script = substr($script, $pos + 1);
+            break;
+        }
+    }
+
+    if (strpos($script, 'public/') === 0) {
+        $script = substr($script, 7);
+    }
+
+    return $script !== '' ? $script : basename(str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? ''));
+}
+
+/**
+ * ¿Coincide la ruta del menú con la página actual?
+ * Marca también las vistas hermanas (crear, editar, constancia...) de esa sección.
+ */
+function nav_coincide(string $ruta, string $actual): bool
+{
+    if ($actual === $ruta) {
+        return true;
+    }
+
+    $directorio = dirname($ruta);
+
+    return $directorio !== '.' && $directorio === dirname($actual);
+}
 
 /**
  * Genera un enlace del menú.
@@ -48,7 +94,7 @@ $iconos = [
 function nav_link(string $clave, string $ruta, string $texto, string $actual, array $iconos, ?int $badge = null): void
 {
     $href = base_url($ruta);
-    $activo = $actual === $ruta || $actual === basename($ruta);
+    $activo = nav_coincide($ruta, $actual);
     echo '<a class="nav-item' . ($activo ? ' active' : '') . '" href="' . e($href) . '"'
         . ($activo ? ' aria-current="page"' : '') . '>';
     echo '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . ($iconos[$clave] ?? $iconos['dashboard']) . '"/></svg>';
@@ -57,6 +103,45 @@ function nav_link(string $clave, string $ruta, string $texto, string $actual, ar
         echo '<span class="nav-badge">' . (int) $badge . '</span>';
     }
     echo '</a>';
+}
+
+/**
+ * ¿Es la ruta actual alguna de las rutas dadas?
+ */
+function nav_activa(array $rutas, string $actual): bool
+{
+    foreach ($rutas as $ruta) {
+        if (nav_coincide($ruta, $actual)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Renderiza un grupo del menú con su cabecera plegable (acordeón).
+ *
+ * @param string   $id      Identificador estable del grupo (para recordar el estado)
+ * @param string   $texto   Etiqueta visible del grupo
+ * @param string   $clave   Icono del grupo en $iconos
+ * @param bool     $abierto Si debe mostrarse desplegado
+ * @param callable $items   Genera los enlaces del grupo
+ */
+function nav_grupo(string $id, string $texto, string $clave, array $iconos, bool $abierto, callable $items): void
+{
+    $gid = 'grupo-' . $id;
+
+    echo '<div class="nav-group' . ($abierto ? ' abierto' : '') . '">';
+    echo '<button class="nav-group-toggle" type="button" data-nav-group="' . e($gid) . '"'
+        . ' aria-expanded="' . ($abierto ? 'true' : 'false') . '" aria-controls="' . e($gid) . '">';
+    echo '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . ($iconos[$clave] ?? $iconos['dashboard']) . '"/></svg>';
+    echo '<span>' . e($texto) . '</span>';
+    echo '<svg class="nav-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    echo '</button>';
+    echo '<div class="nav-group-body" id="' . e($gid) . '">';
+    $items();
+    echo '</div>';
+    echo '</div>';
 }
 
 $esAdmin      = Auth::es_admin();
@@ -107,58 +192,134 @@ $etiquetaHorarios    = $esProfesor ? 'Mi horario' : 'Horarios';
                     <?php nav_link('dashboard', $esProfesor ? 'profesor.php' : 'dashboard.php', 'Resumen', $paginaActual, $iconos); ?>
 
                     <?php if ($verRegistros): ?>
-                        <div class="nav-label">Registros</div>
-                        <?php if (Auth::puede('estudiantes.ver')): ?>
-                            <?php nav_link('estudiantes', 'views/estudiantes/listar.php', $etiquetaEstudiantes, $paginaActual, $iconos); ?>
-                        <?php endif; ?>
-                        <?php if (Auth::puede('profesores.ver')): ?>
-                            <?php nav_link('profesores', 'views/profesores/listar.php', 'Profesores', $paginaActual, $iconos); ?>
-                        <?php endif; ?>
-                        <?php if (Auth::puede('cursos.ver')): ?>
-                            <?php nav_link('cursos', 'views/cursos/listar.php', $etiquetaCursos, $paginaActual, $iconos); ?>
-                        <?php endif; ?>
+                        <?php nav_grupo(
+                            'registros',
+                            'Registros',
+                            'grupo_registros',
+                            $iconos,
+                            nav_activa(['views/estudiantes/listar.php', 'views/profesores/listar.php', 'views/cursos/listar.php'], $paginaActual),
+                            function () use ($paginaActual, $iconos, $etiquetaEstudiantes, $etiquetaCursos): void {
+                                if (Auth::puede('estudiantes.ver')) {
+                                    nav_link('estudiantes', 'views/estudiantes/listar.php', $etiquetaEstudiantes, $paginaActual, $iconos);
+                                }
+                                if (Auth::puede('profesores.ver')) {
+                                    nav_link('profesores', 'views/profesores/listar.php', 'Profesores', $paginaActual, $iconos);
+                                }
+                                if (Auth::puede('cursos.ver')) {
+                                    nav_link('cursos', 'views/cursos/listar.php', $etiquetaCursos, $paginaActual, $iconos);
+                                }
+                            }
+                        ); ?>
                     <?php endif; ?>
 
                     <?php if ($verGestion): ?>
-                        <div class="nav-label">Gestión</div>
-                        <?php if (Auth::puede('matriculas.ver')): ?>
-                            <?php nav_link('matriculas', 'views/matriculas/listar.php', 'Matrículas', $paginaActual, $iconos); ?>
-                        <?php endif; ?>
-                        <?php if (Auth::puede('notas.ver')): ?>
-                            <?php nav_link('notas', 'views/notas/listar.php', $etiquetaNotas, $paginaActual, $iconos); ?>
-                        <?php endif; ?>
-                        <?php if (Auth::puede('horarios.ver')): ?>
-                            <?php nav_link('horarios', 'views/horarios/ver.php', $etiquetaHorarios, $paginaActual, $iconos); ?>
-                        <?php endif; ?>
+                        <?php nav_grupo(
+                            'gestion',
+                            'Gestión',
+                            'grupo_gestion',
+                            $iconos,
+                            nav_activa(['views/matriculas/listar.php', 'views/notas/listar.php', 'views/horarios/ver.php'], $paginaActual),
+                            function () use ($paginaActual, $iconos, $etiquetaNotas, $etiquetaHorarios): void {
+                                if (Auth::puede('matriculas.ver')) {
+                                    nav_link('matriculas', 'views/matriculas/listar.php', 'Matrículas', $paginaActual, $iconos);
+                                }
+                                if (Auth::puede('notas.ver')) {
+                                    nav_link('notas', 'views/notas/listar.php', $etiquetaNotas, $paginaActual, $iconos);
+                                }
+                                if (Auth::puede('horarios.ver')) {
+                                    nav_link('horarios', 'views/horarios/ver.php', $etiquetaHorarios, $paginaActual, $iconos);
+                                }
+                            }
+                        ); ?>
                     <?php endif; ?>
 
                     <?php if ($verComunicacion): ?>
-                        <div class="nav-label">Comunicación</div>
-                        <?php if (Auth::puede('noticias.ver')): ?>
-                            <?php nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos); ?>
-                        <?php endif; ?>
+                        <?php nav_grupo(
+                            'comunicacion',
+                            'Comunicación',
+                            'grupo_comunicacion',
+                            $iconos,
+                            nav_activa(['views/noticias/listar.php'], $paginaActual),
+                            function () use ($paginaActual, $iconos): void {
+                                if (Auth::puede('noticias.ver')) {
+                                    nav_link('noticias', 'views/noticias/listar.php', 'Noticias', $paginaActual, $iconos);
+                                }
+                            }
+                        ); ?>
                     <?php endif; ?>
 
                     <?php if ($verReportes): ?>
-                        <div class="nav-label">Reportes</div>
-                        <?php nav_link('reportes', 'views/reportes/generar.php', 'Generar reportes', $paginaActual, $iconos); ?>
-                        <?php nav_link('reportes', 'views/estudiantes/reportes/promedios.php', 'Promedios', $paginaActual, $iconos); ?>
+                        <?php nav_grupo(
+                            'reportes',
+                            'Reportes',
+                            'grupo_reportes',
+                            $iconos,
+                            nav_activa(['views/reportes/generar.php', 'views/estudiantes/reportes/promedios.php'], $paginaActual),
+                            function () use ($paginaActual, $iconos): void {
+                                nav_link('reportes', 'views/reportes/generar.php', 'Generar reportes', $paginaActual, $iconos);
+                                nav_link('reportes', 'views/estudiantes/reportes/promedios.php', 'Promedios', $paginaActual, $iconos);
+                            }
+                        ); ?>
                     <?php endif; ?>
 
                     <?php if ($verAdministracion): ?>
-                        <div class="nav-label">Administración</div>
-                        <?php if (Auth::puede('usuarios.ver')): ?>
-                            <?php nav_link('usuarios', 'views/usuarios/listar.php', 'Usuarios', $paginaActual, $iconos); ?>
-                        <?php endif; ?>
-                        <?php if (Auth::puede('auditoria.ver')): ?>
-                            <?php nav_link('auditoria', 'views/auditoria/listar.php', 'Auditoría', $paginaActual, $iconos); ?>
-                        <?php endif; ?>
+                        <?php nav_grupo(
+                            'administracion',
+                            'Administración',
+                            'grupo_administracion',
+                            $iconos,
+                            nav_activa(['views/usuarios/listar.php', 'views/auditoria/listar.php'], $paginaActual),
+                            function () use ($paginaActual, $iconos): void {
+                                if (Auth::puede('usuarios.ver')) {
+                                    nav_link('usuarios', 'views/usuarios/listar.php', 'Usuarios', $paginaActual, $iconos);
+                                }
+                                if (Auth::puede('auditoria.ver')) {
+                                    nav_link('auditoria', 'views/auditoria/listar.php', 'Auditoría', $paginaActual, $iconos);
+                                }
+                            }
+                        ); ?>
                     <?php endif; ?>
 
-                    <div class="nav-label">Cuenta</div>
-                    <?php nav_link('perfil', 'perfil.php', 'Mi perfil', $paginaActual, $iconos); ?>
-                    <?php nav_link('salir', 'logout.php', 'Cerrar sesión', $paginaActual, $iconos); ?>
+                    <?php nav_grupo(
+                        'cuenta',
+                        'Cuenta',
+                        'grupo_cuenta',
+                        $iconos,
+                        true,
+                        function () use ($paginaActual, $iconos): void {
+                            nav_link('perfil', 'perfil.php', 'Mi perfil', $paginaActual, $iconos);
+                            nav_link('salir', 'logout.php', 'Cerrar sesión', $paginaActual, $iconos);
+                        }
+                    ); ?>
             </nav>
+
+            <script>
+                /* Restaura el estado plegado/desplegado de los grupos antes del primer pintado. */
+                (function () {
+                    var guardado = {};
+                    try {
+                        guardado = JSON.parse(localStorage.getItem('sistema.nav.grupos') || '{}');
+                    } catch (e) { guardado = {}; }
+
+                    var grupos = document.querySelectorAll('.nav-group');
+                    for (var i = 0; i < grupos.length; i++) {
+                        var grupo = grupos[i];
+                        var btn = grupo.querySelector('[data-nav-group]');
+                        if (!btn) continue;
+
+                        var id = btn.getAttribute('data-nav-group');
+                        var abierto = (id in guardado)
+                            ? guardado[id] === true
+                            : grupo.classList.contains('abierto');
+
+                        /* El grupo de la página abierta siempre se muestra. */
+                        if (grupo.querySelector('.nav-item.active')) abierto = true;
+
+                        grupo.classList.toggle('abierto', abierto);
+                        btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                    }
+                })();
+            </script>
 
             <div class="sidebar-foot">
                 <div class="sidebar-user">

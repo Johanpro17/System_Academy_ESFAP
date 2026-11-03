@@ -231,17 +231,90 @@ svg {
     border-color: transparent;
 }
 
-.nav-label {
-    padding: 18px 12px 8px;
-    font-size: .66rem;
-    font-weight: 700;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: #8f82ab;
+/* ---------- Grupos plegables del menú (acordeón) ---------- */
+
+.nav-group {
+    margin-top: 14px;
 }
 
-.nav-label:first-child {
+.nav-group-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+    color: #8f82ab;
+    font: inherit;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .16s ease, color .16s ease;
+}
+
+.nav-group-toggle>svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.nav-group-toggle>span {
+    flex: 1;
+    min-width: 0;
+}
+
+.nav-group-toggle .nav-caret {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 13px;
+    opacity: .55;
+    transition: transform .24s ease;
+}
+
+.nav-group.abierto>.nav-group-toggle .nav-caret {
+    transform: rotate(180deg);
+}
+
+.nav-group-toggle:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #c4b7e2;
+}
+
+.nav-group.abierto>.nav-group-toggle {
+    color: #b6a8d8;
+}
+
+.nav-group-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--brand-50), inset 0 0 0 2px var(--brand);
+}
+
+/* Contenedor deslizable: oculto por completo y fuera de foco cuando está cerrado. */
+.nav-group-body {
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    padding: 0 0 0 4px;
+    transition: max-height .3s ease, opacity .2s ease, visibility 0s linear .3s;
+}
+
+.nav-group.abierto>.nav-group-body {
+    max-height: 560px;
+    visibility: visible;
+    opacity: 1;
     padding-top: 4px;
+    transition: max-height .3s ease, opacity .2s ease, visibility 0s;
 }
 
 .nav-item {
@@ -4255,5 +4328,309 @@ table.data tbody tr:focus-within {
 
     .sidebar {
         width: min(84vw, var(--sidebar-w));
+    }
+}
+
+/* =========================================================
+   Panel del profesor: resumen
+   ========================================================= */
+
+.profe-welcome .dashboard-welcome-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+@media screen and (max-width: 1150px) {
+    .profe-welcome {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profe-welcome .dashboard-quick-actions {
+        width: 100%;
+    }
+
+    .profe-welcome .dashboard-quick-actions .btn {
+        flex: 1 1 auto;
+    }
+}
+
+.profe-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+@media screen and (max-width: 1100px) {
+    .profe-top {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* La tabla vive dentro del panel: un solo borde, sin caja anidada */
+.panel > .table-wrap {
+    border: 0;
+    border-radius: 0;
+}
+
+.profe-curso {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.profe-curso b {
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.profe-curso small {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+}
+
+.profe-promedio {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.profe-promedio small {
+    margin-left: 1px;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--text-mute);
+}
+
+/* Agenda semanal */
+
+.profe-agenda {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profe-agenda-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profe-agenda-dia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.profe-agenda-dia b {
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+}
+
+.profe-agenda-dia .badge {
+    padding: 2px 8px;
+    font-size: .62rem;
+}
+
+.profe-clase {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-2);
+}
+
+.profe-clase.is-hoy {
+    border-color: var(--brand-100);
+    background: var(--brand-50);
+    box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.profe-clase-hora {
+    display: flex;
+    flex: 0 0 46px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+
+.profe-clase-hora b {
+    font-size: .78rem;
+    font-weight: 800;
+    color: var(--brand);
+}
+
+.profe-clase-hora small {
+    font-size: .68rem;
+    font-weight: 600;
+    color: var(--text-mute);
+}
+
+.profe-clase-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.profe-clase-body b {
+    font-size: .86rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.profe-clase-body small {
+    font-size: .74rem;
+    color: var(--text-mute);
+}
+
+/* Evaluaciones */
+
+.profe-evals {
+    display: flex;
+    flex-direction: column;
+}
+
+.profe-eval {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.profe-eval:first-child {
+    padding-top: 0;
+}
+
+.profe-eval:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.profe-eval-fecha {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-2);
+    line-height: 1;
+}
+
+.profe-eval-fecha b {
+    font-size: 1rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.profe-eval-fecha small {
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+}
+
+.profe-eval-fecha.es-proxima {
+    border-color: var(--brand-100);
+    background: var(--brand-50);
+    color: var(--brand);
+}
+
+.profe-eval-fecha.es-proxima small {
+    color: var(--brand);
+    opacity: .8;
+}
+
+.profe-eval-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.profe-eval-body b {
+    font-size: .86rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.profe-eval-body small {
+    font-size: .74rem;
+    color: var(--text-mute);
+}
+
+/* Carga de estudiantes por curso */
+
+.profe-carga {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profe-carga-fila {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profe-carga-fila .flex-between {
+    gap: 12px;
+}
+
+.profe-carga-nombre {
+    min-width: 0;
+    overflow: hidden;
+    font-size: .84rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profe-carga-meta {
+    font-size: .76rem;
+    color: var(--text-mute);
+    white-space: nowrap;
+}
+
+.profe-carga-meta b {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Modo oscuro: conservar el contraste del bloque de hoy */
+[data-theme="oscuro"] .profe-clase.is-hoy {
+    background: color-mix(in srgb, var(--brand) 16%, var(--surface-2));
+}
+
+@media screen and (max-width: 560px) {
+    .profe-eval .li-meta {
+        display: none;
+    }
+
+    .profe-clase {
+        gap: 10px;
+        padding: 10px 11px;
     }
 }

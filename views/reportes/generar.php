@@ -303,13 +303,26 @@ require_once APP_ROOT . '/layout/header.php';
     <div class="panel-body">
         <div class="export-grid">
             <?php
-            $exportables = [
-                'estudiantes' => ['Estudiantes', 'Listado con especialidad y estado', 'M17 21l4.4-4.4M9 11l3 3L22 4'],
-                'profesores'  => ['Profesores', 'Datos de contacto y titulación', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z'],
-                'cursos'      => ['Cursos', 'Plan de estudios activo', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2zM9 9h6M9 13h6'],
-                'matriculas'  => ['Matrículas', 'Inscripciones por periodo ' . $periodo, 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'],
-                'notas'       => ['Notas', 'Calificaciones del periodo ' . $periodo, 'M9 19V5l12-2v14l-12 2zM9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z'],
+            /* Solo se ofrece exportar los módulos que el rol puede consultar. */
+            $permisoExportacion = [
+                'estudiantes' => 'estudiantes.ver',
+                'profesores'  => 'profesores.ver',
+                'cursos'      => 'cursos.ver',
+                'matriculas'  => 'matriculas.ver',
+                'notas'       => 'notas.ver',
             ];
+
+            $exportables = array_filter(
+                [
+                    'estudiantes' => ['Estudiantes', 'Listado con especialidad y estado', 'M17 21l4.4-4.4M9 11l3 3L22 4'],
+                    'profesores'  => ['Profesores', 'Datos de contacto y titulación', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z'],
+                    'cursos'      => ['Cursos', 'Plan de estudios activo', 'M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2zM9 9h6M9 13h6'],
+                    'matriculas'  => ['Matrículas', 'Inscripciones por periodo ' . $periodo, 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'],
+                    'notas'       => ['Notas', 'Calificaciones del periodo ' . $periodo, 'M9 19V5l12-2v14l-12 2zM9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z'],
+                ],
+                static fn(string $clave): bool => Auth::puede($permisoExportacion[$clave]),
+                ARRAY_FILTER_USE_KEY
+            );
             ?>
             <?php foreach ($exportables as $clave => [$nombre, $desc, $icono]): ?>
                 <a class="mod-card" style="text-decoration:none"

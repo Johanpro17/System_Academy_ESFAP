@@ -14,8 +14,8 @@ El sistema tiene **cuatro roles**:
 | Rol | Alcance |
 | --- | --- |
 | Administrador | Acceso total; gestiona usuarios, profesores, cursos, noticias y configuración |
-| Profesor | Panel propio; solo sus cursos, estudiantes, notas y horario |
-| Secretaría | Gestiona estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios, reportes y noticias |
+| Profesor | Panel propio; solo notas, horario y reportes de sus cursos |
+| Secretaría | Gestiona estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios y reportes |
 | Auditoría | Consulta toda la información y la bitácora, sin escrituras |
 
 El **alumno no es un usuario de este sistema**: es una ficha académica (nombres, apellidos, DNI, matrícula, especialidad, contacto y estado). Las cuentas históricas de alumno se conservan desactivadas y sin rol, por lo que no pueden iniciar sesión aquí. Su acceso, si se habilita, pertenecerá a la plataforma de alumnos que se implementará por separado.

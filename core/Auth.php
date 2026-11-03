@@ -25,7 +25,7 @@ class Auth
             self::ROL_PROFESOR   => [
                 'nombre'      => 'Profesor',
                 'clase'       => 'rol-profesor',
-                'descripcion' => 'Gestiona notas y consulta sus cursos asignados',
+                'descripcion' => 'Gestiona notas y horarios de sus cursos y consulta sus reportes',
             ],
             self::ROL_SECRETARIA => [
                 'nombre'      => 'Secretaría',
@@ -57,11 +57,11 @@ class Auth
 
             self::ROL_PROFESOR => [
                 'dashboard.ver',
-                'estudiantes.ver',
-                'cursos.ver',
                 'notas.ver',
                 'notas.editar',
                 'horarios.ver',
+                'reportes.ver',
+                'reportes.exportar',
                 'perfil.ver',
             ],
 
@@ -78,7 +78,6 @@ class Auth
                 'horarios.ver',
                 'reportes.ver',
                 'reportes.exportar',
-                'noticias.ver',
                 'perfil.ver',
             ],
 

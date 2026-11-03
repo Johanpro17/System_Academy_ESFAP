@@ -68,6 +68,38 @@
         }
     });
 
+    /* ---------- Grupos plegables del menú lateral ---------- */
+
+    var NAV_GRUPOS_KEY = 'sistema.nav.grupos';
+
+    function leerEstadoGrupos() {
+        try {
+            return JSON.parse(localStorage.getItem(NAV_GRUPOS_KEY) || '{}') || {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function guardarEstadoGrupo(id, abierto) {
+        try {
+            var estado = leerEstadoGrupos();
+            estado[id] = abierto;
+            localStorage.setItem(NAV_GRUPOS_KEY, JSON.stringify(estado));
+        } catch (e) { /* almacenamiento no disponible */ }
+    }
+
+    document.addEventListener('click', function (ev) {
+        var btn = ev.target.closest('[data-nav-group]');
+        if (!btn) return;
+
+        var grupo = btn.closest('.nav-group');
+        if (!grupo) return;
+
+        var abierto = grupo.classList.toggle('abierto');
+        btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        guardarEstadoGrupo(btn.getAttribute('data-nav-group'), abierto);
+    });
+
     /* ---------- Popovers (notificaciones, menú usuario) ---------- */
 
     function cerrarPopovers() {

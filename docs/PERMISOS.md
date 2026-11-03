@@ -9,8 +9,8 @@ La fuente de verdad es `core/Auth.php` (`Auth::permisos_por_rol()`). El menú (`
 | Rol | ID | Alcance |
 | --- | --- | --- |
 | Administrador | 1 | Acceso total mediante comodín `*` |
-| Profesor | 2 | Solo sus cursos asignados: estudiantes, cursos, notas y horario |
-| Secretaría | 4 | Estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios, reportes y noticias |
+| Profesor | 2 | Solo sus cursos: notas, horario y reportes acotados |
+| Secretaría | 4 | Estudiantes y matrículas (crear/editar, sin eliminar); profesores y cursos en lectura; horarios y reportes |
 | Auditoría | 5 | Consulta global en solo lectura, incluida la bitácora; sin escrituras |
 
 El alumno no es un rol de este panel. Las cuentas históricas de alumno están desactivadas y sin rol.
@@ -20,13 +20,13 @@ El alumno no es un rol de este panel. Las cuentas históricas de alumno están d
 | Permiso | Administrador | Profesor | Secretaría | Auditoría |
 | --- | :-: | :-: | :-: | :-: |
 | `dashboard.ver` | ✓ | ✓ | ✓ | ✓ |
-| `estudiantes.ver` | ✓ | ✓ | ✓ | ✓ |
+| `estudiantes.ver` | ✓ | — | ✓ | ✓ |
 | `estudiantes.crear` | ✓ | — | ✓ | — |
 | `estudiantes.editar` | ✓ | — | ✓ | — |
 | `estudiantes.eliminar` | ✓ | — | — | — |
 | `profesores.ver` | ✓ | — | ✓ | ✓ |
 | `profesores.gestionar` | ✓ | — | — | — |
-| `cursos.ver` | ✓ | ✓ | ✓ | ✓ |
+| `cursos.ver` | ✓ | — | ✓ | ✓ |
 | `cursos.gestionar` | ✓ | — | — | — |
 | `matriculas.ver` | ✓ | — | ✓ | ✓ |
 | `matriculas.crear` | ✓ | — | ✓ | — |
@@ -35,9 +35,9 @@ El alumno no es un rol de este panel. Las cuentas históricas de alumno están d
 | `notas.ver` | ✓ | ✓ | — | ✓ |
 | `notas.editar` | ✓ | ✓ | — | — |
 | `horarios.ver` | ✓ | ✓ | ✓ | ✓ |
-| `reportes.ver` | ✓ | — | ✓ | ✓ |
-| `reportes.exportar` | ✓ | — | ✓ | ✓ |
-| `noticias.ver` | ✓ | — | ✓ | — |
+| `reportes.ver` | ✓ | ✓ | ✓ | ✓ |
+| `reportes.exportar` | ✓ | ✓ | ✓ | ✓ |
+| `noticias.ver` | ✓ | — | — | — |
 | `noticias.gestionar` | ✓ | — | — | — |
 | `usuarios.ver` | ✓ | — | — | ✓ |
 | `usuarios.gestionar` | ✓ | — | — | — |
@@ -51,16 +51,16 @@ El alumno no es un rol de este panel. Las cuentas históricas de alumno están d
 | Rol | Menú lateral |
 | --- | --- |
 | Administrador | Todos los módulos |
-| Profesor | Resumen, Mis estudiantes, Mis cursos, Mis notas, Mi horario, Mi perfil, Cerrar sesión |
-| Secretaría | Resumen, Estudiantes, Profesores, Cursos, Matrículas, Horarios, Noticias, Generar reportes, Promedios, Mi perfil, Cerrar sesión |
-| Auditoría | Resumen, Estudiantes, Profesores, Cursos, Matrículas, Notas, Horarios, Generar reportes, Promedios, Usuarios, Auditoría, Mi perfil, Cerrar sesión |
+| Profesor | Resumen, Gestión (Mis notas, Mi horario), Reportes (Generar reportes, Promedios), Cuenta |
+| Secretaría | Resumen, Registros (Estudiantes, Profesores, Cursos), Gestión (Matrículas, Horarios), Reportes (Generar reportes, Promedios), Cuenta |
+| Auditoría | Resumen, Registros (Estudiantes, Profesores, Cursos), Gestión (Matrículas, Notas, Horarios), Reportes (Generar reportes, Promedios), Administración (Usuarios, Auditoría), Cuenta |
 
-Un grupo del menú (Registros, Gestión, Comunicación, Reportes, Administración) solo se muestra si el rol tiene al menos un permiso dentro de él. Por eso el Profesor no ve los grupos de matrículas, reportes, noticias, usuarios ni auditoría.
+Un grupo del menú (Registros, Gestión, Comunicación, Reportes, Administración) solo se muestra si el rol tiene al menos un permiso dentro de él. Por eso el Profesor no ve Registros, Comunicación ni Administración, y dentro de Gestión solo aparecen Notas y Horarios (no Matrículas).
 
 ## Alcance de los datos
 
-- **Profesor:** los listados de estudiantes, cursos, notas y horario se filtran por los cursos asignados en `curso_docentes`. No ve matrículas globales, reportes, noticias, usuarios ni auditoría.
-- **Secretaría:** administra estudiantes y matrículas; puede crear y editar, pero **no eliminar** estudiantes ni matrículas. Profesores y cursos son de solo lectura. No accede a notas, usuarios ni auditoría.
+- **Profesor:** notas y horario se filtran por los cursos asignados en `curso_docentes`; los reportes y sus exportaciones también. No ve el padrón de estudiantes, el catálogo de cursos, matrículas globales, noticias, usuarios ni auditoría.
+- **Secretaría:** administra estudiantes y matrículas; puede crear y editar, pero **no eliminar** estudiantes ni matrículas. Profesores y cursos son de solo lectura. No accede a notas, noticias, usuarios ni auditoría.
 - **Auditoría:** consulta estudiantes, profesores, cursos, matrículas, notas, horarios, reportes y usuarios sin poder crear, editar ni eliminar. Su panel principal muestra la bitácora en lugar de noticias.
 - **Administrador:** conserva acceso total.
 
