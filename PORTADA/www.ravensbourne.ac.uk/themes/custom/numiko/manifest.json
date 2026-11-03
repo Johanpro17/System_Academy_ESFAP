@@ -1,0 +1,19 @@
+{
+  "short_name": "Ravensbourne University",
+  "name": "Ravensbourne University London",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "favicons/android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicons/android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "theme_color": "#0069B4",
+  "display": "standalone"
+}

@@ -1,5 +1,5 @@
 # =========================================================
-# Sistema Académico — Protección de Apache
+# Sistema Académico - Protección de Apache
 # =========================================================
 
 # No listar directorios sin index
@@ -9,9 +9,21 @@ Options -Indexes
 Options -SymLinksIfOwnerMatch
 
 # Página de entrada por defecto
-DirectoryIndex public/index.php
+DirectoryIndex index.php index.html PORTADA/index.html
 
-# Bloquear archivos sensibles por extensión (dumps, logs, claves…)
+# La portada vive en PORTADA/www.ravensbourne.ac.uk/index.html (sus imágenes,
+# estilos y fuentes usan rutas relativas a esa carpeta). La raíz de la app
+# redirige allí para que el sitio y el archivo abierto directamente (file://)
+# usen las mismas rutas.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^(.*)/$
+    RewriteRule ^$ %1/PORTADA/www.ravensbourne.ac.uk/index.html [R=302,L]
+    RewriteCond %{REQUEST_URI} ^(.*)/PORTADA/?$
+    RewriteRule ^PORTADA/?$ %1/PORTADA/www.ravensbourne.ac.uk/index.html [R=302,L]
+</IfModule>
+
+# Bloquear archivos sensibles por extensión (dumps, logs, claves...)
 <IfModule mod_authz_core.c>
     <FilesMatch "\.(sql|log|ini|bak|old|env|dist|lock)$">
         Require all denied
