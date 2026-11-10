@@ -11,16 +11,16 @@ Options -SymLinksIfOwnerMatch
 # Página de entrada por defecto
 DirectoryIndex index.php index.html PORTADA/index.html
 
-# La portada vive en PORTADA/www.ravensbourne.ac.uk/index.html (sus imágenes,
+# La portada vive en PORTADA/esfap/index.html (sus imágenes,
 # estilos y fuentes usan rutas relativas a esa carpeta). La raíz de la app
 # redirige allí para que el sitio y el archivo abierto directamente (file://)
 # usen las mismas rutas.
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_URI} ^(.*)/$
-    RewriteRule ^$ %1/PORTADA/www.ravensbourne.ac.uk/index.html [R=302,L]
+    RewriteRule ^$ %1/PORTADA/esfap/index.html [R=302,L]
     RewriteCond %{REQUEST_URI} ^(.*)/PORTADA/?$
-    RewriteRule ^PORTADA/?$ %1/PORTADA/www.ravensbourne.ac.uk/index.html [R=302,L]
+    RewriteRule ^PORTADA/?$ %1/PORTADA/esfap/index.html [R=302,L]
 </IfModule>
 
 # Bloquear archivos sensibles por extensión (dumps, logs, claves...)
