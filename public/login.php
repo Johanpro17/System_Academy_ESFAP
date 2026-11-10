@@ -272,7 +272,7 @@ $tema = $_SESSION['tema'] ?? ($_COOKIE['tema'] ?? 'claro');
                 </span>
 
                 <div class="auth-foot">
-                    ¿Necesitas ayuda? <a href="<?= e(base_url('index.php')) ?>">Volver a la portada</a>
+                    ¿Necesitas ayuda? <a href="<?= e(url_raiz() . '/PORTADA/esfap/index.html') ?>">Volver a la portada</a>
                 </div>
             </div>
         </div>

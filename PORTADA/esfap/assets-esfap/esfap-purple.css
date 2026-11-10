@@ -1,0 +1,420 @@
+/* ===== Paleta morada ESFAP =====
+   Hoja compartida por: index, study, open-days, international-students.
+   Se carga con <link> relativo; funciona en localhost y en file://  */
+/* ===== Paleta morada ESFAP ===== */
+body{
+  --esfap-900:#3d0f52; --esfap-800:#4a1259; --esfap-700:#5b1e7a;
+  --esfap-600:#702d87; --esfap-500:#8e44ad; --esfap-300:#b57edc; --esfap-100:#f5ebfc;
+}
+/* acentos que eran amarillos */
+.bg-color-yellow{background-color:#702d87!important;color:#fff!important}
+.bg-color-yellow .text-color-base{color:#fff!important}
+.text-color-yellow{color:#b57edc!important}
+.border-color-yellow{border-color:#702d87!important}
+.bg-dots-yellow,
+.sm\:bg-dots-yellow,
+.md\:bg-dots-yellow,
+.lg\:bg-dots-yellow,
+.hg\:bg-dots-yellow{
+  background-image:radial-gradient(#b57edc 4px,transparent 0),radial-gradient(#b57edc 4px,transparent 0)!important;
+}
+/* subrayados animados */
+.animate-underline-yellow .animate-underline-child,
+.animate-underline-yellow-thick .animate-underline-child,
+.animate-underline-blue .animate-underline-child{
+  background-image:linear-gradient(#b57edc,#b57edc)!important;
+}
+/* botones */
+.c-button--primary{background-color:#702d87!important;border-color:#702d87!important;color:#fff!important}
+.c-button--primary:before{background-color:#3d0f52!important}
+/* tarjetas y bloques de color */
+.bg-color-blue-dark{background-color:#5b1e7a!important}
+.bg-color-red{background-color:#4a1259!important}
+.bg-color-purple{background-color:#702d87!important}
+/* sección grande que era amarilla */
+.c-welcome.bg-color-yellow{background-color:#702d87!important;color:#fff!important}
+.c-welcome.bg-color-yellow h2,
+.c-welcome.bg-color-yellow p,
+.c-welcome.bg-color-yellow a{color:#fff!important}
+/* círculos decorativos */
+.circle{background-color:#8e44ad!important}
+.circles-group:nth-child(2n) .circle{background-color:#b57edc!important}
+.circles-group:nth-child(3n) .circle{background-color:#5b1e7a!important}
+/* enlaces de acento */
+.hover\:text-color-blue:hover,
+.focus\:text-color-blue:focus{color:#b57edc!important}
+.text-color-blue-dark,
+.hover\:text-color-blue-dark:hover{color:#702d87!important}
+
+/* ===== Fase 2: amarillos restantes ===== */
+/* buscador */
+.c-button--search{background-color:#702d87!important;border-color:#702d87!important;color:#fff!important}
+.c-button--search:before{background-color:#3d0f52!important}
+.c-button--search svg{color:#fff!important}
+/* botones de medios (tarjetas con hover) */
+.c-button-media:hover,
+.c-button-media:focus{background-color:#5b1e7a!important;color:#fff!important}
+.c-button-media:hover .text-color-base,
+.c-button-media:focus .text-color-base{color:#fff!important}
+/* desplegable del menú: fondo claro para no perder legibilidad */
+.c-menu-dropdown-reveal{background-color:#f5ebfc!important;color:#3d0f52!important}
+/* sliders */
+.flickity-button{background-color:#702d87!important;color:#fff!important}
+.flickity-button:hover{background-color:#3d0f52!important;color:#fff!important}
+.c-slider .flickity-button{background-color:#3d0f52!important;color:#b57edc!important}
+.c-slider .flickity-button:hover{background-color:#702d87!important;color:#fff!important}
+.flickity-counter{background-color:#3d0f52!important;color:#b57edc!important}
+/* franjas diagonales de la sección de bienvenida */
+.c-welcome:before{background-image:linear-gradient(135deg,#8e44ad 4.17%,transparent 0,transparent 50%,#8e44ad 0,#8e44ad 54.17%,transparent 0,transparent)!important}
+@media (min-width:768px){
+  .c-welcome:after{background-image:linear-gradient(135deg,#8e44ad 4.17%,transparent 0,transparent 50%,#8e44ad 0,#8e44ad 54.17%,transparent 0,transparent)!important}
+}
+.translate-welcome-arrow-top{color:#702d87!important}
+/* barra de ordenación */
+.c-sort-by .c-sort-by__dropdown .c-sort-by__button:after{background-color:#b57edc!important}
+/* filtros y subrayados de listas */
+.c-filter-bar label span,
+.c-list-bar__link .animate-underline-child{background-image:linear-gradient(#b57edc,#b57edc)!important}
+/* reproductor de vídeo */
+.c-play-button:hover .c-play-button__icon-bg svg,
+.c-play-button:focus .c-play-button__icon-bg svg{color:#b57edc!important}
+.c-play-button:hover .c-play-button__duration,
+.c-play-button:focus .c-play-button__duration{background-color:#702d87!important;color:#fff!important}
+/* franjas y puntos */
+.bg-stripe-yellow,
+.sm\:bg-stripe-yellow,
+.md\:bg-stripe-yellow,
+.lg\:bg-stripe-yellow,
+.hg\:bg-stripe-yellow{background-image:linear-gradient(135deg,#b57edc 4.17%,transparent 0,transparent 50%,#b57edc 0,#b57edc 54.17%,transparent 0,transparent)!important}
+.md\:border-color-yellow{border-color:#702d87!important}
+.group:hover .group-hover\:bg-color-yellow{background-color:#702d87!important;color:#fff!important}
+/* texto de bienvenida siempre legible sobre morado */
+.c-welcome{color:#fff!important}
+.c-welcome .text-color-base,
+.c-welcome .text-color-black{color:#fff!important}
+
+/* ===== Colores base del tema que no son amarillos ===== */
+.text-color-blue{color:#b57edc!important}
+.bg-color-orange{background-color:#8e44ad!important}
+.text-color-orange{color:#b57edc!important}
+.bg-color-pink{background-color:#8e44ad!important}
+.text-color-pink{color:#b57edc!important}
+
+/* ===== Fase 3: naranjas y rosas del tema -> morado ===== */
+/* subrayado animado que JS pone bajo el titulo del hero (era naranja #ec6825) */
+.line-content{background-image:linear-gradient(#b57edc,#b57edc)!important}
+.underline-orange-thick{background-image:linear-gradient(#b57edc,#b57edc)!important}
+.animate-underline-orange .animate-underline-child,
+.animate-underline-pink .animate-underline-child{background-image:linear-gradient(#b57edc,#b57edc)!important}
+/* textos y fondos rosa/naranja */
+.text-color-pink{color:#b57edc!important}
+.group:hover .group-hover\:text-color-pink{color:#b57edc!important}
+.bg-color-orange{background-color:#8e44ad!important}
+.bg-color-pink{background-color:#8e44ad!important}
+/* franjas y patrones rosa/naranja */
+.bg-stripe-pink,.bg-stripe-orange,
+.sm\:bg-stripe-pink,.sm\:bg-stripe-orange,
+.md\:bg-stripe-pink,.md\:bg-stripe-orange,
+.lg\:bg-stripe-pink,.lg\:bg-stripe-orange,
+.hg\:bg-stripe-pink,.hg\:bg-stripe-orange{background-image:linear-gradient(135deg,#8e44ad 4.17%,transparent 0,transparent 50%,#8e44ad 0,#8e44ad 54.17%,transparent 0,transparent)!important}
+/* tabs y acordeones */
+.c-tabs__item:first-child .c-tabs__link.is-active,
+.c-tabs__item:last-child .c-tabs__link.is-active,
+.c-tabbed-accordion__item--pink .c-tabbed-accordion__button[aria-expanded=true],
+.c-tabbed-accordion__item--orange .c-tabbed-accordion__button[aria-expanded=true]{background-color:#702d87!important;color:#fff!important}
+.c-tabs__link--pink .animate-underline-child,
+.c-tabs__link--orange .animate-underline-child{background-image:linear-gradient(#b57edc,#b57edc)!important}
+.c-tab__panel--pink,.c-tab__panel--orange,
+.c-tabbed-accordion__item--pink,.c-tabbed-accordion__item--orange{border-color:#702d87!important}
+.c-tab__panel--pink .c-course-overview-item__icon,
+.c-tab__panel--orange .c-course-overview-item__icon{color:#b57edc!important}
+.c-tab__panel--pink .c-course-overview__stripe,
+.c-tab__panel--orange .c-course-overview__stripe{background-image:linear-gradient(135deg,#8e44ad 4.17%,transparent 0,transparent 50%,#8e44ad 0,#8e44ad 54.17%,transparent 0,transparent)!important}
+/* cursor personalizado */
+.c-cursor.blend{background-color:#702d87!important}
+.boxed--dark>h2:first-child{color:#b57edc!important}
+
+/* ===== Fase 4: titulos del hero en movil ===== */
+@media (max-width:767px){
+  [data-js-hook="home-hero-title"],
+  [data-js-hook="hero-title"]{font-size:clamp(2rem,8.5vw,3rem)!important;line-height:1.05!important}
+  [data-js-hook="home-hero-title"] .line,
+  [data-js-hook="home-hero-title"] .line-content,
+  [data-js-hook="hero-title"] .line,
+  [data-js-hook="hero-title"] .line-content{white-space:normal!important;overflow-wrap:break-word!important}
+}
+
+/* El video ocupa la primera pantalla completa; el contenido siguiente queda debajo. */
+body.path-frontpage #block-entityviewcontent > .flex > .c-hero--with-media{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100vh!important;
+  min-height:100vh!important;
+  max-height:none!important;
+  flex-shrink:0!important;
+}
+@supports (height:100svh){
+  body.path-frontpage #block-entityviewcontent > .flex > .c-hero--with-media{
+    height:100svh!important;
+    min-height:100svh!important;
+  }
+}
+
+
+/* Título de la sección del carrusel: mayor tamaño en todas las pantallas. */
+body.path-frontpage h2#slice-17443-title{font-size:clamp(3rem,7vw,7.5rem)!important;line-height:1.02!important}
+
+/* Desplaza ligeramente a la izquierda solo el carrusel principal. */
+body.path-frontpage [aria-labelledby="slice-17443-title"] .c-showcase{transform:translateX(-1.5rem)}
+@media (min-width:1024px){
+  body.path-frontpage [aria-labelledby="slice-17443-title"] .c-showcase{transform:translateX(-3.5rem)}
+}
+
+/* Noticias y eventos usan casi todo el ancho disponible, con tarjetas a su altura original. */
+body.path-frontpage .home-cards-container{
+  width:100%!important;
+  max-width:none!important;
+  padding-left:clamp(1.25rem,5vw,6rem)!important;
+  padding-right:clamp(1.25rem,5vw,6rem)!important;
+}
+body.path-frontpage .home-news-block .slice-title,
+body.path-frontpage .home-events-block .slice-title{font-size:clamp(3rem,6vw,7rem)!important;line-height:.98!important;max-width:none!important}
+body.path-frontpage .home-news-block .slice-cta-button,
+body.path-frontpage .home-events-block .slice-cta-button{
+  width:30%!important;
+  min-height:5rem!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  padding:1.25rem 2rem!important;
+  font-size:clamp(1.1rem,1.4vw,1.5rem)!important;
+}
+body.path-frontpage .home-news-block .flex-grid__item > article > a,
+body.path-frontpage .home-events-block .flex-grid__item > article > a{width:100%!important}
+@media (max-width:1023px){
+  body.path-frontpage .home-news-block .slice-cta-button,
+  body.path-frontpage .home-events-block .slice-cta-button{width:auto!important}
+}
+body.path-frontpage .home-news-mobile-cta,
+body.path-frontpage .home-events-mobile-cta{min-height:4.5rem!important;font-size:1.25rem!important;padding:1.25rem!important}
+
+/* Título principal «Únete a nosotros»: escala mayor y adaptable. */
+body.path-frontpage [data-js-hook="home-hero-title"]{font-size:clamp(3.5rem,9vw,10rem)!important;line-height:.95!important}
+
+/* Flecha animada entre el texto y la imagen de bienvenida. */
+body.path-frontpage [data-js-hook="big-arrow"],
+body.path-frontpage [data-js-hook="big-arrow"] svg,
+body.path-frontpage [data-js-hook="big-arrow"] line{color:#000!important;stroke:#000!important}
+
+/* Sección «We make…»: encabezado y perfiles con más espacio. */
+body.path-frontpage section[aria-labelledby="slice-64-title"] > .container{
+  width:100%!important;
+  max-width:none!important;
+  padding-left:clamp(1.25rem,5vw,6rem)!important;
+  padding-right:clamp(1.25rem,5vw,6rem)!important;
+}
+body.path-frontpage #slice-64-title{
+  max-width:none!important;
+  font-size:clamp(3rem,6vw,7rem)!important;
+  line-height:.98!important;
+}
+body.path-frontpage section[aria-labelledby="slice-64-title"] .c-profile-card{
+  width:100%!important;
+}
+@media (min-width:768px){
+  body.path-frontpage section[aria-labelledby="slice-64-title"] .c-profile-card{
+    width:85vw!important;
+    max-width:none!important;
+  }
+}
+body.path-frontpage section[aria-labelledby="slice-64-title"] .c-profile-card h3{
+  font-size:clamp(2.75rem,4.5vw,5rem)!important;
+  line-height:1!important;
+}
+body.path-frontpage section[aria-labelledby="slice-64-title"] .c-profile-card .c-statement{
+  font-size:clamp(1.125rem,1.5vw,1.5rem)!important;
+  line-height:1.45!important;
+}
+body.path-frontpage section[aria-labelledby="slice-64-title"] .c-profile-card .c-button{
+  font-size:1.2rem!important;
+  padding:1.25rem 2rem!important;
+}
+
+/* Discover what’s possible: más ancho para el título y sus cuatro tarjetas. */
+body.path-frontpage section[aria-labelledby="slice-27-title"] > .container,
+body.path-frontpage section[aria-labelledby="slice-21987-title"] > .container{
+  width:100%!important;
+  max-width:none!important;
+  padding-left:clamp(1.25rem,5vw,6rem)!important;
+  padding-right:clamp(1.25rem,5vw,6rem)!important;
+}
+body.path-frontpage #slice-27-title,
+body.path-frontpage #slice-21987-title{
+  max-width:none!important;
+  font-size:clamp(3rem,6vw,7rem)!important;
+  line-height:.98!important;
+}
+body.path-frontpage section[aria-labelledby="slice-27-title"] .flex-grid__item > article > a{
+  width:100%!important;
+}
+/* Industry connections: ampliar los cuadros del carrusel sin aumentar su altura. */
+@media (min-width:1400px){
+  body.path-frontpage section[aria-labelledby="slice-21987-title"] .c-showcase__media{
+    width:clamp(46rem,50vw,64rem)!important;
+  }
+}
+
+
+/* Mantener el texto de la tarjeta del menú por encima del círculo decorativo. */
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > h2,
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > p,
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > a{
+  position:relative;
+  z-index:1;
+}
+
+
+/* El círculo decorativo se conserva detrás del contenido de la tarjeta del menú. */
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > svg:first-child{
+  position:absolute!important;
+  z-index:0!important;
+  pointer-events:none;
+}
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > h2,
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > p,
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > a{
+  position:relative!important;
+  z-index:2!important;
+}
+
+[data-js-hook='overlay-panel-2'] .c-medium-cta__content > p{
+  position:relative!important;
+  z-index:3!important;
+}
+
+
+/* Study: títulos y tarjetas de carreras más grandes y con menos márgenes. */
+body.path-alias-study h1[data-js-hook="hero-title"]{
+  font-size:clamp(3.75rem,8.5vw,9rem)!important;
+  line-height:.98!important;
+}
+body.path-alias-study #slice-2120-title{
+  max-width:none!important;
+  font-size:clamp(2.75rem,5.5vw,6rem)!important;
+  line-height:1!important;
+}
+body.path-alias-study #slice-21045-title{
+  display:table!important;
+  width:fit-content!important;
+  max-width:100%!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  padding:clamp(.65rem,1vw,1rem)!important;
+  border-width:6px!important;
+  font-size:clamp(1.75rem,3.2vw,3.25rem)!important;
+  line-height:1.05!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] > .container{
+  width:100%!important;
+  max-width:none!important;
+  padding-left:clamp(1.25rem,5vw,6rem)!important;
+  padding-right:clamp(1.25rem,5vw,6rem)!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid--teasers{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:clamp(1rem,2vw,2rem)!important;
+  margin:0!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item > article > a{
+  width:100%!important;
+  height:clamp(28rem,38vw,40rem)!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] [data-js-hook="card-title"]{
+  font-size:clamp(2rem,3vw,3.5rem)!important;
+  line-height:1.05!important;
+}
+@media (max-width:900px){
+  body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid--teasers{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:600px){
+  body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid--teasers{
+    grid-template-columns:1fr!important;
+  }
+  body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item > article > a{
+    height:clamp(25rem,105vw,34rem)!important;
+  }
+}
+
+
+/* Study: ajustar el bloque de título y las tarjetas a las proporciones del ejemplo. */
+body.path-alias-study #slice-21045-title{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding:1.25rem!important;
+  border-width:10px!important;
+  font-size:clamp(1.5rem,2.8vw,3rem)!important;
+  line-height:1.05!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item > article > a{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  padding-bottom:0!important;
+  aspect-ratio:1.4 / 1!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] [data-js-hook="card-title"]{
+  font-size:clamp(1.5rem,2vw,2.5rem)!important;
+  line-height:1.08!important;
+}
+
+
+/* Study cards: use larger, square frames to show the complete career images. */
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item > article > a{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  padding-bottom:0!important;
+  aspect-ratio:1.03627 / 1!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .flex-grid__item img{
+  object-fit:cover!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .c-teaser-fallback{
+  background-color:transparent!important;
+}
+body.path-alias-study section[aria-labelledby="slice-21045-title"] .c-teaser-fallback::before{
+  content:none!important;
+}
+
+/* Puertas Abiertas: título principal ligeramente más grande. */
+body.page-open-days h1[data-js-hook="hero-title"]{
+  font-size:clamp(3.75rem,8.5vw,9rem)!important;
+  line-height:.98!important;
+}
+
+
+body.page-open-days #slice-3322-title,
+body.page-open-days #open-days-testimonials-title{
+  font-size:clamp(2.5rem,4.3vw,4.5rem)!important;
+  line-height:1.05!important;
+}
+body.page-open-days section[aria-labelledby="slice-3322-title"] .c-statement p,
+body.page-open-days section[aria-labelledby="open-days-testimonials-title"] .c-statement p{
+  font-size:clamp(1.25rem,1.8vw,1.75rem)!important;
+  line-height:1.5!important;
+}
+
+body.page-open-days [data-js-hook="jump-links"]{display:none!important}
