@@ -418,3 +418,17 @@ body.page-open-days section[aria-labelledby="open-days-testimonials-title"] .c-s
 }
 
 body.page-open-days [data-js-hook="jump-links"]{display:none!important}
+/* Mantiene la navegación del menú en el ancho de su antigua columna derecha. */
+.c-header-overlay [data-js-hook="overlay-panel-3"]{
+  width:100%!important;
+  flex:1 1 100%!important;
+  margin-left:0!important;
+}
+@media(min-width:1024px){
+  .c-header-overlay [data-js-hook="overlay-panel-3"]{
+    width:40%!important;
+    flex:0 0 40%!important;
+    margin-left:auto!important;
+  }
+}
+
